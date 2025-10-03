@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
+'''DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'mydb',
@@ -87,7 +87,19 @@ DATABASES = {
         'HOST':'localhost',
         'PORT':'3306',
     }
+}'''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'fintech',
+        'USER': 'fintech_user',
+        'PASSWORD': 'StrongPassword123!',
+        'HOST': '127.0.0.1',   # must be 127.0.0.1, not "localhost"
+        'PORT': '3306',
+    }
 }
+
+
 
 
 # Password validation
