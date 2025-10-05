@@ -13,7 +13,7 @@ import uuid
 from django.utils import timezone
 
 
-SALT = "8b4f6b2cc1868d75ef79e5cfb8779c11b6a374bf0fce05b485581bf4e1e25b96c8c2855015de8449"
+SALT = "8b4f6b2cc1868d75ef79"
 
 
 class TransactionCreateView(APIView):
@@ -26,9 +26,6 @@ class TransactionCreateView(APIView):
 
 class RegistrationView(APIView):
     def post(self, request, format=None):
-        request.data["password"] = make_password(
-            password=request.data["password"], salt=SALT
-        )
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()

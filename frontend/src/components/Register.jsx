@@ -25,6 +25,11 @@ function Register() {
                 repassword
             });
 
+            console.log(
+                password,
+                repassword)
+            console.log(response.data);
+
         } catch (error) {
             if (error.response) {
                 const msg = error.response.data?.message || 'Unknown server error!';
