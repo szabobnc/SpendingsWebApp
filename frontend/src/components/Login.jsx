@@ -15,8 +15,10 @@ function Login() {
                 username,
                 password
             });
-
-            //handle login
+            const token = response.data;
+            sessionStorage.setItem('access', token.access)
+            sessionStorage.setItem('refresh', token.refresh)
+            console.log(response.data);
 
         } catch (error) {
             if (error.response) {
