@@ -5,23 +5,25 @@ import axios from "axios";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
-function Login() {
+function Register() {
     const [username, setUsername] = useState("")
+    const [name, setName] = useState("")
+    const [birthday, setBirthday] = useState("")
     const [password, setPassword] = useState("")
+    const [repassword, setRePassword] = useState("")
 
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${apiUrl}api/login/`, {
+            const response = await axios.post(`${apiUrl}api/register/`, {
                 username,
-                password
+                name,
+                birthday,
+                password,
+                repassword
             });
-            const token = response.data;
-            sessionStorage.setItem('access', token.access)
-            sessionStorage.setItem('refresh', token.refresh)
-            console.log(response.data);
 
         } catch (error) {
             if (error.response) {
@@ -38,19 +40,30 @@ function Login() {
     return (
         <div>
             <fieldset>
-                <h1>Login</h1>
+                <h1>Register</h1>
                 <form onSubmit={handleSubmit}>
                     <label htmlFor="username">Username:</label>
                     <input type="text" name="username" id="usenrame" placeholder="username" onChange={(e) => setUsername(e.target.value)} />
+                    
+                    <label htmlFor="name">Full name:</label>
+                    <input type="text" name="name" id="name" placeholder="Full name" onChange={(e) => setName(e.target.value)} />
+                    
                     <label htmlFor="password">Password:</label>
                     <input type="password" name="password" id="password" placeholder="password" onChange={(e) => setPassword(e.target.value)} />
-                    <button type="submit">Login</button>
+                    
+                    <label htmlFor="repassword">Password again:</label>
+                    <input type="password" name="repassword" id="repassword" placeholder="repassword" onChange={(e) => setRePassword(e.target.value)} />
+                    
+                    <label htmlFor="birthday">Date of birth:</label>
+                    <input type="date" name="birthday" id="birthday" placeholder="1999-12-31" onChange={(e) => setBirthday(e.target.value)} />
+                    
+                    <button type="submit">Register</button>
                 </form>
-                <button onClick={() => navigate("/register")}>Register</button>
+                <button onClick={() => navigate("/login")}>Back to Login</button>
             </fieldset>
         </div>
     )
 
 }
 
-export default Login;
+export default Register;

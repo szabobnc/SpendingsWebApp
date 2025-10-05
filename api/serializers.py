@@ -1,7 +1,12 @@
 # serializers.py
 from rest_framework import serializers
-from .models import Transaction, Person
+from .models import Transaction, Person, Token
 from django.contrib.auth.hashers import make_password 
+
+class TokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Token
+        fields = ["token", "created_at", "expires_at", "user_id", "is_used"]
 
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
