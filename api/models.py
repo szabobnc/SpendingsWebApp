@@ -22,7 +22,7 @@ class Person(models.Model):
     username = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=100)
     income = models.IntegerField(default=0)
-    password = models.CharField(max_length=128)  # hashed
+    password = models.CharField(max_length=255)  # hashed
     birthday = models.DateField()
     # Optional: is_premium field
     is_premium = models.BooleanField(default=False)

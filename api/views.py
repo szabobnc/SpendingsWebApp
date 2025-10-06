@@ -4,16 +4,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import TransactionSerializer
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from .serializers import RegisterSerializer, TokenSerializer
 from .models import Person, Token
 from datetime import datetime, timedelta
 import hashlib
 import uuid
 from django.utils import timezone
-
-
-SALT = "8b4f6b2cc1868d75ef79"
 
 
 class TransactionCreateView(APIView):
@@ -46,13 +43,12 @@ class LoginView(APIView):
     def post(self, request, format=None):
         username = request.data["username"]
         password = request.data["password"]
-        hashed_password = make_password(password=password, salt=SALT)
         user = Person.objects.filter(username=username).first()
-        if user is None or user.password != hashed_password:
+        if user is None or not check_password(password, user.password):
             return Response(
-                {
+                { 
                     "success": False,
-                    "message": "Invalid Username or password!",
+                    "message": "Invalid username or password!",
                 },
                 status=status.HTTP_200_OK,
             )
