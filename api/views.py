@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import TransactionSerializer
 from django.contrib.auth.hashers import make_password, check_password
-from .serializers import RegisterSerializer, TokenSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Person, Token
 from datetime import datetime, timedelta
 import hashlib
@@ -41,19 +41,24 @@ class RegistrationView(APIView):
 
 class LoginView(APIView):
     def post(self, request, format=None):
-        username = request.data["username"]
-        password = request.data["password"]
-        user = Person.objects.filter(username=username).first()
-        if user is None or not check_password(password, user.password):
-            return Response(
-                { 
-                    "success": False,
-                    "message": "Invalid username or password!",
-                },
-                status=status.HTTP_200_OK,
-            )
-        else:
-            return Response(
-                {"success": True, "message": "You are now logged in!"},
-                status=status.HTTP_200_OK,
-            )
+        username = request.data.get("username")
+        password = request.data.get("password")
+
+        try:
+            user = Person.objects.get(username=username)
+        except Person.DoesNotExist:
+            return Response({'error': 'Invalid username or password!'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        if not check_password(password, user.password):
+            return Response({'error': 'Invalid username or password!'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+            'user': {
+                'id': user.id,
+                'name': getattr(user, 'name', ''),
+            }
+        })

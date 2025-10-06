@@ -1,37 +1,26 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-
-
-const apiUrl = process.env.REACT_APP_API_BASE_URL;
+import { useAuth } from "./context/AuthContext";
 
 function Login() {
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
+    const [credentials, setCredentials] = useState({
+        username: '',
+        password: '',
+    });
 
+    const { login } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${apiUrl}api/login/`, {
-                username,
-                password
-            });
-            const token = response.data;
-            sessionStorage.setItem('access', token.access)
-            sessionStorage.setItem('refresh', token.refresh)
-            console.log(response.data);
-
-        } catch (error) {
-            if (error.response) {
-                const msg = error.response.data?.message || 'Unknown server error!';
-                alert(`Error: ${msg}`);
-            } else if (error.request) {
-                alert('Server not responding!');
-            } else {
-                alert('Request error: ' + error.message);
+            const user = await login(credentials);
+            if (user) {
+                navigate('/main');
             }
+
+        } catch (err) {
+            console.error("Login failed:", err);
         }
     };
 
@@ -41,9 +30,9 @@ function Login() {
                 <h1>Login</h1>
                 <form onSubmit={handleSubmit}>
                     <label htmlFor="username">Username:</label>
-                    <input type="text" name="username" id="usenrame" placeholder="username" onChange={(e) => setUsername(e.target.value)} />
+                    <input type="text" name="username" id="usenrame" placeholder="username" onChange={(e) => setCredentials({ ...credentials, username: e.target.value })} />
                     <label htmlFor="password">Password:</label>
-                    <input type="password" name="password" id="password" placeholder="password" onChange={(e) => setPassword(e.target.value)} />
+                    <input type="password" name="password" id="password" placeholder="password" onChange={(e) => setCredentials({ ...credentials, password: e.target.value })} />
                     <button type="submit">Login</button>
                 </form>
                 <button onClick={() => navigate("/register")}>Register</button>

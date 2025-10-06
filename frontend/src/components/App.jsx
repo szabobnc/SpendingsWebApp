@@ -1,22 +1,26 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
 import Login from "./Login";
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Register from "./Register";
+import Main from "./Main";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./ProtectedRoute";
 
-
-const apiUrl = process.env.REACT_APP_API_BASE_URL;
-
-function App() {
+const App = () => {
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Routes>
-    </BrowserRouter>
+<Router>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/main" element={<Main />} />
+          </Route>
+          
+        </Routes>
+      </AuthProvider>
+</Router>
   )
 
 }
