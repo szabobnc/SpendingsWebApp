@@ -7,4 +7,5 @@ urlpatterns = [
     path("login/", LoginView.as_view(), name="login"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("getCategories/", GetCategoriesView.as_view(), name="getCategories")
+    #path("createTransaction//", CreateTransactionView.as_view(), name="create_transaction") TODO
 ]
