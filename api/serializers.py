@@ -1,6 +1,6 @@
 # serializers.py
 from rest_framework import serializers
-from .models import Transaction, Person, Token
+from .models import Transaction, Person, Token, Category
 from django.contrib.auth.hashers import make_password 
 
 class TokenSerializer(serializers.ModelSerializer):
@@ -30,3 +30,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         validated_data.pop('repassword')
         validated_data['password'] = make_password(validated_data['password'])
         return super().create(validated_data)
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'description']

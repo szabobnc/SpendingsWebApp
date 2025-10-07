@@ -3,10 +3,10 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import TransactionSerializer, RegisterSerializer
+from .serializers import TransactionSerializer, RegisterSerializer, CategorySerializer
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Person, Token
+from .models import Person, Token, Category
 from datetime import datetime, timedelta
 import hashlib
 import uuid
@@ -62,3 +62,9 @@ class LoginView(APIView):
                 'name': getattr(user, 'name', ''),
             }
         })
+
+class GetCategoriesView(APIView):
+    def get(self, request, format=None):
+        categories = Category.objects.all()
+        serializer = CategorySerializer(categories, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
