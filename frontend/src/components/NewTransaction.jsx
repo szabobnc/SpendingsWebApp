@@ -53,7 +53,7 @@ function NewTransaction() {
         e.preventDefault();
         try {
             console.log(details);
-            const response = await axios.post(`${apiUrl}aoi/createTransaction`, details);
+            const response = await axios.post(`${apiUrl}api/createTransaction/`, details);
         } catch (error) {
 
         }
