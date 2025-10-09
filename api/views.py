@@ -6,7 +6,7 @@ from rest_framework import status
 from .serializers import TransactionSerializer, RegisterSerializer, CategorySerializer
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Person, Token, Category
+from .models import Person, Token, Category, Transaction
 from datetime import datetime, timedelta
 import hashlib
 import uuid
@@ -15,9 +15,16 @@ from django.utils import timezone
 
 class TransactionCreateView(APIView):
     def post(self, request):
-        serializer = TransactionSerializer(data=request.data)
+        data = request.data.copy()
+        user_id = data.get("user")
+        try:
+            user = Person.objects.get(id=user_id)
+        except Person.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = TransactionSerializer(data=data)
         if serializer.is_valid():
-            serializer.save(user=request.user)  # associate transaction with logged-in user
+            serializer.save(user=user)  # associate transaction with logged-in user
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
