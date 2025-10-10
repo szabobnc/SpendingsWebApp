@@ -4,7 +4,7 @@ import axios from "axios";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
-function NewTransaction({ onClose }) {
+function NewTransaction({ onClose , onAdd}) {
 
     const { user, loading } = useAuth();
 
@@ -49,16 +49,19 @@ function NewTransaction({ onClose }) {
         }
     }
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await axios.post(`${apiUrl}api/createTransaction/`, details);
-            onClose();
-        } catch (error) {
-            console.error(error);
-        }   
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+        const response = await axios.post(`${apiUrl}api/createTransaction/`, details);
+        const savedTx = response.data;
 
-    }
+        if (onAdd) onAdd(savedTx); // update Main’s transaction list instantly
+        onClose();
+    } catch (error) {
+        console.error(error);
+    }   
+};
+
 
     if (isLoading) {
         return (

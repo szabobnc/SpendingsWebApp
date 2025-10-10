@@ -91,3 +91,19 @@ def createCategory(request):
         print("Error creating category:", e)
         return Response({"error": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+
+@api_view(['GET'])
+def transaction_list(request):
+    user_id = request.GET.get('user_id')
+    if not user_id:
+        return Response({"error": "user_id is required"}, status=400)
+
+    try:
+        user = Person.objects.get(id=user_id)
+    except Person.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+
+    transactions = Transaction.objects.filter(user=user).order_by('-date')
+    serializer = TransactionSerializer(transactions, many=True)
+    return Response(serializer.data)

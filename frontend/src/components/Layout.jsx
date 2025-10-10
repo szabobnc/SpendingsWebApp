@@ -4,31 +4,27 @@ import { useState } from "react";
 import NewTransaction from "./NewTransaction";
 import NewCategory from "./NewCategory"; 
 
-function Layout() {
+function Layout({ onAddTransaction }) {
     const { logout } = useAuth();
     const navigate = useNavigate();
     const [showTransaction, setShowTransaction] = useState(false);
-    const [showCategory, setShowCategory] = useState(false); 
-
-    const handleLogout = () => {
-        logout();
-        navigate("/login"); 
-    };
+    const [showCategory, setShowCategory] = useState(false);
 
     return (
         <>
             <div className="navbar">
                 <nav onClick={() => setShowTransaction(true)}>Add new transaction</nav>
                 <nav><Link to="/main">Add new saving goal</Link></nav>
-
                 <nav onClick={() => setShowCategory(true)}>Add new category</nav>
-
-                <button onClick={handleLogout}>Logout</button>
+                <button onClick={logout}>Logout</button>
                 <Outlet />
             </div>
 
             {showTransaction && (
-                <NewTransaction onClose={() => setShowTransaction(false)} />
+                <NewTransaction
+                    onClose={() => setShowTransaction(false)}
+                    onAdd={onAddTransaction} // pass the callback to NewTransaction
+                />
             )}
 
             {showCategory && (

@@ -9,10 +9,13 @@ class TokenSerializer(serializers.ModelSerializer):
         fields = ["token", "created_at", "expires_at", "user_id", "is_used"]
 
 class TransactionSerializer(serializers.ModelSerializer):
+    category_name = serializers.CharField(source='category.name', default="No category", read_only=True)
+
     class Meta:
         model = Transaction
-        fields = ['id', 'user', 'category', 'amount', 'date', 'description', 'is_income']
-        read_only_fields = ['id', 'user', 'date']  # user/date set automatically
+        fields = ['id', 'user', 'category', 'category_name', 'amount', 'date', 'description', 'is_income']
+        read_only_fields = ['id', 'user', 'date']
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     repassword = serializers.CharField(write_only=True)
