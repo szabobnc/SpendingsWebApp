@@ -12,4 +12,6 @@ urlpatterns = [
     path("createTransaction/", TransactionCreateView.as_view(), name="create_transaction"),
     path('transactions/', transaction_list, name='transaction-list'),
     path('createCategory/', views.createCategory, name='createCategory'),
+    path('transactions/', views.transaction_list, name='transaction-list'),
+    path('transactions/<int:pk>/', views.transaction_detail, name='transaction-detail'),
 ]

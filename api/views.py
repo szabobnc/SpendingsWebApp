@@ -11,6 +11,34 @@ from datetime import datetime, timedelta
 import hashlib
 import uuid
 from django.utils import timezone
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Transaction
+from .serializers import TransactionSerializer
+
+@api_view(['GET', 'PATCH', 'DELETE'])
+def transaction_detail(request, pk):
+    try:
+        transaction = Transaction.objects.get(pk=pk)
+    except Transaction.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = TransactionSerializer(transaction)
+        return Response(serializer.data)
+    
+    elif request.method == 'PATCH':
+        serializer = TransactionSerializer(transaction, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    elif request.method == 'DELETE':
+        transaction.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class TransactionCreateView(APIView):
     def post(self, request):

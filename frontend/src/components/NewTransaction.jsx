@@ -4,12 +4,10 @@ import axios from "axios";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
-function NewTransaction({ onClose , onAdd}) {
-
+function NewTransaction({ onClose, onAdd, editingTransaction, setEditingTransaction }) {
     const { user, loading } = useAuth();
-
-    const [isLoading, setLoading] = useState(true);
-    const [categories, setCategories] = useState(null);
+    const [categories, setCategories] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     const [details, setDetails] = useState({
         user: '',
@@ -20,24 +18,33 @@ function NewTransaction({ onClose , onAdd}) {
         description: '',
     });
 
+    // Load categories
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get(`${apiUrl}api/getCategories/`);
-                setCategories(response.data);
+                const res = await axios.get(`${apiUrl}api/getCategories/`);
+                setCategories(res.data);
             } catch (err) {
-                console.error("Failed to load categories:", err);
+                console.error(err);
             } finally {
-                setLoading(false);
+                setIsLoading(false);
             }
         };
-
-        initDetails();
         fetchCategories();
-    }, [loading]);
+    }, []);
 
-    const initDetails = () => {
-        if (!loading && user) {
+    // Prefill form if editing
+    useEffect(() => {
+        if (editingTransaction) {
+            setDetails({
+                user: editingTransaction.user,
+                is_income: editingTransaction.is_income.toString(),
+                category: editingTransaction.category || '',
+                amount: editingTransaction.amount,
+                date: editingTransaction.date.split('T')[0],
+                description: editingTransaction.description,
+            });
+        } else if (user) {
             setDetails({
                 user: user.id,
                 is_income: '',
@@ -47,65 +54,67 @@ function NewTransaction({ onClose , onAdd}) {
                 description: '',
             });
         }
-    }
+    }, [editingTransaction, user]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-        const response = await axios.post(`${apiUrl}api/createTransaction/`, details);
-        const savedTx = response.data;
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            let res;
+            if (editingTransaction) {
+                res = await axios.patch(`${apiUrl}api/transactions/${editingTransaction.id}/`, details);
+            } else {
+                res = await axios.post(`${apiUrl}api/createTransaction/`, details);
+            }
 
-        if (onAdd) onAdd(savedTx); // update Main’s transaction list instantly
-        onClose();
-    } catch (error) {
-        console.error(error);
-    }   
-};
+            onAdd(res.data);
 
+            // Clear edit state
+            if (editingTransaction) setEditingTransaction(null);
 
-    if (isLoading) {
-        return (
-            <div>Loading...</div>
-        )
-    } else {
-        return (
-            <div className="overlay">
-                <div className="modal">
-                    <fieldset>
-                        <form onSubmit={handleSubmit}>
-                            <h1>Create transaction</h1>
-                            <label htmlFor="income">
-                                <input type="radio" id="income" name="is_income" value="true" checked={details.is_income === 'true'} onChange={(e) => setDetails({ ...details, is_income: e.target.value })} required/>
-                                Income
-                            </label>
-                            <label htmlFor="expenditure">
-                                <input type="radio" id="expenditure" name="is_income" value="false" checked={details.is_income === 'false'} onChange={(e) => setDetails({ ...details, is_income: e.target.value })} required/>
-                                Expenditure
-                            </label>
+            onClose();
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
-                            <label htmlFor="category">Category</label>
-                            <select name="category" id="category" onChange={(e) => setDetails({ ...details, category: e.target.value })} required>
-                                <option value="" selected>Choose a category </option>
-                                {categories.map((c, i) => (
-                                    <option value={c.id}>{c.name}</option>
-                                ))}
-                            </select>
+    if (isLoading) return <div>Loading...</div>;
 
-                            <label htmlFor="amount">Amount</label>
-                            <input type="number" name="amount" id="amount" onChange={(e) => setDetails({ ...details, amount: e.target.value })} required/>
+    return (
+        <div className="overlay">
+            <div className="modal">
+                <fieldset>
+                    <form onSubmit={handleSubmit}>
+                        <h1>{editingTransaction ? "Edit Transaction" : "Create Transaction"}</h1>
 
-                            <label htmlFor="description">Description</label>
-                            <input type="text" name="description" id="description" onChange={(e) => setDetails({ ...details, description: e.target.value })} required/>
+                        <label>
+                            <input type="radio" name="is_income" value="true" checked={details.is_income === 'true'} onChange={e => setDetails({...details, is_income: e.target.value})} required/>
+                            Income
+                        </label>
 
-                            <button type="submit">Save</button>
-                            <button type="reset" onClick={initDetails}>Reset</button>
-                            <button onClick={onClose}>Close</button>
-                        </form>
-                    </fieldset>
-                </div>
+                        <label>
+                            <input type="radio" name="is_income" value="false" checked={details.is_income === 'false'} onChange={e => setDetails({...details, is_income: e.target.value})} required/>
+                            Expense
+                        </label>
+
+                        <label>Category</label>
+                        <select value={details.category} onChange={e => setDetails({...details, category: e.target.value})} required>
+                            <option value="">Choose a category</option>
+                            {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                        </select>
+
+                        <label>Amount</label>
+                        <input type="number" value={details.amount} onChange={e => setDetails({...details, amount: e.target.value})} required/>
+
+                        <label>Description</label>
+                        <input type="text" value={details.description} onChange={e => setDetails({...details, description: e.target.value})} required/>
+
+                        <button type="submit">{editingTransaction ? "Save Changes" : "Create"}</button>
+                        <button type="button" onClick={onClose}>Close</button>
+                    </form>
+                </fieldset>
             </div>
-        );
-    }
+        </div>
+    );
 }
 
 export default NewTransaction;
