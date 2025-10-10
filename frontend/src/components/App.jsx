@@ -5,6 +5,7 @@ import Main from "./Main";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./ProtectedRoute";
 import NewTransaction from "./NewTransaction";
+import NewCategory from "./NewCategory";
 
 const App = () => {
 
@@ -16,6 +17,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/newTransaction" element={<NewTransaction />} />
+          <Route path="/NewCategory" element={<NewCategory />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/main" element={<Main />} />
           </Route>

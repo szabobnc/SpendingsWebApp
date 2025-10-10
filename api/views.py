@@ -12,7 +12,6 @@ import hashlib
 import uuid
 from django.utils import timezone
 
-
 class TransactionCreateView(APIView):
     def post(self, request):
         data = request.data.copy()
@@ -75,3 +74,20 @@ class GetCategoriesView(APIView):
         categories = Category.objects.all()
         serializer = CategorySerializer(categories, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def createCategory(request):
+    try:
+        name = request.data.get('name')
+        description = request.data.get('description', '')
+
+        if not name:
+            return Response({"error": "Name is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        category = Category.objects.create(name=name, description=description)
+        return Response({"id": category.id, "name": category.name, "description": category.description}, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        print("Error creating category:", e)
+        return Response({"error": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
