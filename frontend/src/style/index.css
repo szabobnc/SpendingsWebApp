@@ -141,6 +141,40 @@ button:last-of-type:hover {
     background: #b8c7db;
 }
 
+.charts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+    gap: 2rem;
+    padding: 2rem;
+    background-color: #f0f8ff;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.charts > div {
+    flex: 1 1 400px;
+    min-width: 300px;
+    max-width: 600px;
+    background-color: #ffffff;
+    border: 1px solid #cce7ff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 100, 200, 0.1);
+    padding: 1.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.charts > div:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 100, 200, 0.2);
+}
+
+.google-visualization-chart {
+    width: 100%;
+    height: auto;
+}
+
 @media (max-width: 500px) {
     .modal {
         padding: 1.5rem;

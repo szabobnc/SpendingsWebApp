@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "./context/AuthContext";
 import Layout from "./Layout";
+import TransactionPieChart from "./PieChart";
+
+const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 function Main() {
     const { user } = useAuth();
@@ -12,24 +15,24 @@ function Main() {
     const [editingTransaction, setEditingTransaction] = useState(null);
 
     // Delete a transaction
-const handleDelete = async (id) => {
-    try {
-        const res = await fetch(`http://localhost:8000/api/transactions/${id}/`, {
-            method: "DELETE",
-        });
-        if (!res.ok) throw new Error("Failed to delete transaction");
-        setTransactions(transactions.filter(tx => tx.id !== id));
-    } catch (err) {
-        console.error(err);
-    }
-};
+    const handleDelete = async (id) => {
+        try {
+            const res = await fetch(`${apiUrl}api/transactions/${id}/`, {
+                method: "DELETE",
+            });
+            if (!res.ok) throw new Error("Failed to delete transaction");
+            setTransactions(transactions.filter(tx => tx.id !== id));
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
 
     // Edit a transaction
-const handleEdit = (tx) => {
-    setEditingTransaction(tx);
-    setShowTransaction(true);
-};
+    const handleEdit = (tx) => {
+        setEditingTransaction(tx);
+        setShowTransaction(true);
+    };
 
 
     // Fetch transactions
@@ -37,7 +40,7 @@ const handleEdit = (tx) => {
         if (!user) return;
         const fetchTransactions = async () => {
             try {
-                const res = await fetch(`http://localhost:8000/api/transactions/?user_id=${user.id}`);
+                const res = await fetch(`${apiUrl}api/transactions/?user_id=${user.id}`);
                 if (!res.ok) throw new Error("Failed to fetch transactions");
                 const data = await res.json();
                 setTransactions(data);
@@ -83,19 +86,22 @@ const handleEdit = (tx) => {
             ) : transactions.length === 0 ? (
                 <p>No transactions yet.</p>
             ) : (
-                <ul>
-                    {transactions.map(tx => (
-                        <li key={tx.id} className="flex items-center justify-between mb-2">
-                            <span>
-                                {new Date(tx.date).toISOString().split("T")[0]} - {tx.amount} Ft - {tx.category_name} - ({tx.description}) ({tx.is_income ? "Income" : "Expense"})
-                            </span>
-                            <span>
-                                <button className="mr-2 text-blue-500" onClick={() => handleEdit(tx)}>Edit</button>
-                                <button className="text-red-500" onClick={() => handleDelete(tx.id)}>Delete</button>
-                            </span>
-                        </li>
-                    ))}
-                </ul>
+                <div>
+                    <TransactionPieChart data={transactions} />
+                    <ul>
+                        {transactions.map(tx => (
+                            <li key={tx.id} className="flex items-center justify-between mb-2">
+                                <span>
+                                    {new Date(tx.date).toISOString().split("T")[0]} - {tx.amount} Ft - {tx.category_name} - ({tx.description}) ({tx.is_income ? "Income" : "Expense"})
+                                </span>
+                                <span>
+                                    <button className="mr-2 text-blue-500" onClick={() => handleEdit(tx)}>Edit</button>
+                                    <button className="text-red-500" onClick={() => handleDelete(tx.id)}>Delete</button>
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             )}
         </div>
     );
