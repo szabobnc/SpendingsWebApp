@@ -25,7 +25,7 @@ function Login() {
     };
 
     return (
-        <div>
+        <div className="login">
             <fieldset>
                 <h1>Login</h1>
                 <form onSubmit={handleSubmit}>
@@ -33,8 +33,9 @@ function Login() {
                     <input type="text" name="username" id="usenrame" placeholder="username" onChange={(e) => setCredentials({ ...credentials, username: e.target.value })} />
                     <label htmlFor="password">Password:</label>
                     <input type="password" name="password" id="password" placeholder="password" onChange={(e) => setCredentials({ ...credentials, password: e.target.value })} />
-                    <button type="submit">Login</button>
+                    <button type="submit" style={{marginTop: '20px', background: '#205b9f', color: 'white'}}>Login</button>
                 </form>
+                <p>Don’t have an account? Sign up now!</p>
                 <button onClick={() => navigate("/register")}>Register</button>
             </fieldset>
         </div>
