@@ -47,6 +47,18 @@ code {
     }
 }
 
+div .login {
+    width: 40%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+div .login button{
+    width: 40%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .navbar {
     display: flex;
     flex-direction: row;
