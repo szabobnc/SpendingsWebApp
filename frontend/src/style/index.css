@@ -1,15 +1,15 @@
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+        monospace;
 }
 
 .overlay {
@@ -41,6 +41,7 @@ code {
         opacity: 0;
         transform: scale(0.9);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
@@ -53,7 +54,7 @@ div .login {
     margin-right: auto;
 }
 
-div .login button{
+div .login button {
     width: 40%;
     margin-left: auto;
     margin-right: auto;
@@ -69,9 +70,9 @@ div .login button{
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-form{
-  display: flex;
-  flex-direction: column;
+form {
+    display: flex;
+    flex-direction: column;
 }
 
 fieldset {
@@ -153,6 +154,16 @@ button:last-of-type:hover {
     background: #b8c7db;
 }
 
+button.delete {
+    background-color: rgb(255, 0, 0);
+    margin: 0 5px 0 5px;
+}
+
+button.edit {
+    margin: 0 5px 0 5px;
+    background-color: #3d8ff5;
+}
+
 .charts {
     display: flex;
     flex-wrap: wrap;
@@ -165,7 +176,7 @@ button:last-of-type:hover {
     transition: all 0.3s ease;
 }
 
-.charts > div {
+.charts>div {
     flex: 1 1 400px;
     min-width: 300px;
     max-width: 600px;
@@ -177,7 +188,7 @@ button:last-of-type:hover {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.charts > div:hover {
+.charts>div:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 15px rgba(0, 100, 200, 0.2);
 }
@@ -186,6 +197,53 @@ button:last-of-type:hover {
     width: 100%;
     height: auto;
 }
+
+.tx-table {
+    margin: 2rem auto;
+    width: 90%;
+    max-width: 900px;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 100, 200, 0.1);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+
+td {
+    text-align: left;
+    padding: 0.75rem 1rem;
+}
+
+th {
+    text-align: center;
+    padding: 0.75rem 1rem;
+    background-color: #e3f2ff;
+    color: #004c91;
+    font-weight: 600;
+    font-size: 1rem;
+    border-bottom: 2px solid #cde4ff;
+}
+
+
+tr:nth-child(even) {
+    background-color: #f9fcff;
+}
+
+tr:hover {
+    background-color: #eef7ff;
+    transition: background-color 0.2s ease;
+}
+
+.pos-tx {
+    background-color: #e6f7ea !important;
+}
+
+.neg-tx {
+    background-color: #fdeaea !important;
+}
+
 
 @media (max-width: 500px) {
     .modal {

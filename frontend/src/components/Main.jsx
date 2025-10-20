@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "./context/AuthContext";
 import Layout from "./Layout";
 import TransactionPieChart from "./PieChart";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { MdEdit } from "react-icons/md";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -88,19 +90,23 @@ function Main() {
             ) : (
                 <div>
                     <TransactionPieChart data={transactions} />
-                    <ul>
+                    <table className="tx-table">
+                        <tr>
+                            <th colSpan="5">Transactions</th>
+                        </tr>
                         {transactions.map(tx => (
-                            <li key={tx.id} className="flex items-center justify-between mb-2">
-                                <span>
-                                    {new Date(tx.date).toISOString().split("T")[0]} - {tx.amount} Ft - {tx.category_name} - ({tx.description}) ({tx.is_income ? "Income" : "Expense"})
-                                </span>
-                                <span>
-                                    <button className="mr-2 text-blue-500" onClick={() => handleEdit(tx)}>Edit</button>
-                                    <button className="text-red-500" onClick={() => handleDelete(tx.id)}>Delete</button>
-                                </span>
-                            </li>
+                            <tr className={tx.is_income ? "pos-tx" : "neg-tx"}>
+                                <td>{new Date(tx.date).toISOString().split("T")[0]}</td>
+                                <td>{tx.is_income ? tx.amount : '-' + tx.amount}</td>
+                                <td>{tx.category_name}</td>
+                                <td>{tx.description}</td>
+                                <td style={{width: '18%'}}>
+                                    <button className="edit" onClick={() => handleEdit(tx)}><MdEdit /></button>
+                                    <button className="delete" onClick={() => handleDelete(tx.id)}><RiDeleteBin6Line onClick={() => handleDelete(tx.id)} /> </button>
+                                </td>
+                            </tr>
                         ))}
-                    </ul>
+                    </table>
                 </div>
             )}
         </div>
