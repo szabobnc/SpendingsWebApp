@@ -43,7 +43,7 @@ function Register() {
     };
 
     return (
-        <div>
+        <div className="login">
             <fieldset>
                 <h1>Register</h1>
                 <form onSubmit={handleSubmit}>
@@ -51,18 +51,18 @@ function Register() {
                     <input type="text" name="username" id="usenrame" placeholder="username" onChange={(e) => setUsername(e.target.value)} />
                     
                     <label htmlFor="name">Full name:</label>
-                    <input type="text" name="name" id="name" placeholder="Full name" onChange={(e) => setName(e.target.value)} />
+                    <input type="text" name="name" id="name" placeholder="full name" onChange={(e) => setName(e.target.value)} />
                     
                     <label htmlFor="password">Password:</label>
                     <input type="password" name="password" id="password" placeholder="password" onChange={(e) => setPassword(e.target.value)} />
                     
                     <label htmlFor="repassword">Password again:</label>
-                    <input type="password" name="repassword" id="repassword" placeholder="repassword" onChange={(e) => setRePassword(e.target.value)} />
+                    <input type="password" name="repassword" id="repassword" placeholder="password" onChange={(e) => setRePassword(e.target.value)} />
                     
                     <label htmlFor="birthday">Date of birth:</label>
                     <input type="date" name="birthday" id="birthday" placeholder="1999-12-31" onChange={(e) => setBirthday(e.target.value)} />
                     
-                    <button type="submit">Register</button>
+                    <button type="submit" style={{marginTop: '20px', background: '#205b9f', color: 'white'}}>Register</button>
                 </form>
                 <button onClick={() => navigate("/login")}>Back to Login</button>
             </fieldset>
