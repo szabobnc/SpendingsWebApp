@@ -92,8 +92,7 @@ function Main() {
 
             <h1>Main page</h1>
             <h2>Hello {user?.name}!</h2>
-            {current.getMonth()}
-
+            
             <h3>Transactions in this month</h3>
             {loadingTransactions ? (
                 <p>Loading...</p>
