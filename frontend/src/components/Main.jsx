@@ -12,6 +12,9 @@ function Main() {
     const [transactions, setTransactions] = useState([]);
     const [loadingTransactions, setLoadingTransactions] = useState(true);
 
+    const [posAmount, setPosAmount] = useState(0)
+    const [negAmount, setNegAmount] = useState(0)
+
     const current = new Date();
 
     // Lifted state
@@ -55,7 +58,13 @@ function Main() {
             }
         };
         fetchTransactions();
+
     }, [user]);
+
+        useEffect(() => {
+            setPosAmount(transactions.filter(e => e.is_income).map(e => e.amount).reduce(function (x,y) { return x+y }, 0))
+            setNegAmount(transactions.filter(e => !e.is_income).map(e => e.amount).reduce(function (x,y) { return x+y }, 0))
+    }, [transactions]);
 
     return (
         <div>
@@ -93,6 +102,22 @@ function Main() {
             ) : (
                 <div>
                     <TransactionPieChart data={transactions} />
+                    <table className="tx-table">
+                        <tr>
+                            <th colSpan="2">Current month's balance</th>
+                        </tr>
+                        <tr>
+                            <td className="pos-tx">
+                                {posAmount}
+                            </td>
+                            <td className="neg-tx">
+                                -{negAmount}
+                            </td>
+                        </tr>
+                        <tr className={posAmount-negAmount > 0 ? "pos-tx" : "neg-tx"}>
+                            <td colSpan="2">{posAmount-negAmount}</td>
+                        </tr>
+                    </table>
                     <table className="tx-table">
                         <tr>
                             <th colSpan="5">Transactions</th>
