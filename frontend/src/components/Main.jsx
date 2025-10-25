@@ -12,6 +12,8 @@ function Main() {
     const [transactions, setTransactions] = useState([]);
     const [loadingTransactions, setLoadingTransactions] = useState(true);
 
+    const current = new Date();
+
     // Lifted state
     const [showTransaction, setShowTransaction] = useState(false);
     const [editingTransaction, setEditingTransaction] = useState(null);
@@ -42,7 +44,7 @@ function Main() {
         if (!user) return;
         const fetchTransactions = async () => {
             try {
-                const res = await fetch(`${apiUrl}api/transactions/?user_id=${user.id}`);
+                const res = await fetch(`${apiUrl}api/transactions/?user_id=${user.id}&date=${current.getMonth()}`);
                 if (!res.ok) throw new Error("Failed to fetch transactions");
                 const data = await res.json();
                 setTransactions(data);
@@ -81,8 +83,9 @@ function Main() {
 
             <h1>Main page</h1>
             <h2>Hello {user?.name}!</h2>
+            {current.getMonth()}
 
-            <h3>Transactions</h3>
+            <h3>Transactions in this month</h3>
             {loadingTransactions ? (
                 <p>Loading...</p>
             ) : transactions.length === 0 ? (
