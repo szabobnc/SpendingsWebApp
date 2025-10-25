@@ -124,6 +124,7 @@ def createCategory(request):
 @api_view(['GET'])
 def transaction_list(request):
     user_id = request.GET.get('user_id')
+    month_index = request.GET.get('date')
     if not user_id:
         return Response({"error": "user_id is required"}, status=400)
 
@@ -132,6 +133,16 @@ def transaction_list(request):
     except Person.DoesNotExist:
         return Response({"error": "User not found"}, status=404)
 
-    transactions = Transaction.objects.filter(user=user).order_by('-date')
+    transactions = Transaction.objects.filter(user=user)
+
+    if month_index is not None:
+        try:
+            month = int(month_index) + 1
+            transactions = transactions.filter(date__month=month)
+        except ValueError:
+            return Response({"error": "Invalid date parameter"}, status=400)
+
+
+    transactions = transactions.order_by('-date')
     serializer = TransactionSerializer(transactions, many=True)
     return Response(serializer.data)
