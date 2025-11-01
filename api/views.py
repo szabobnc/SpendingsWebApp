@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import TransactionSerializer, RegisterSerializer, CategorySerializer
+from .serializers import TransactionSerializer, RegisterSerializer, CategorySerializer, PersonSerializer
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Person, Token, Category, Transaction
@@ -11,11 +11,13 @@ from datetime import datetime, timedelta
 import hashlib
 import uuid
 from django.utils import timezone
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Transaction
 from .serializers import TransactionSerializer
+from rest_framework.permissions import IsAuthenticated
+from .authentication import CustomJWTAuthentication
 
 @api_view(['GET', 'PATCH', 'DELETE'])
 def transaction_detail(request, pk):
@@ -86,11 +88,18 @@ class LoginView(APIView):
         if not check_password(password, user.password):
             return Response({'error': 'Invalid username or password!'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        refresh = RefreshToken.for_user(user)
+        # Create a custom token payload for our Person model
+        refresh = RefreshToken()
+        refresh['user_id'] = user.id
+        refresh['username'] = user.username
+        
+        access_token = refresh.access_token
+        access_token['user_id'] = user.id
+        access_token['username'] = user.username
 
         return Response({
             'refresh': str(refresh),
-            'access': str(refresh.access_token),
+            'access': str(access_token),
             'user': {
                 'id': user.id,
                 'name': getattr(user, 'name', ''),
@@ -146,3 +155,32 @@ def transaction_list(request):
     transactions = transactions.order_by('-date')
     serializer = TransactionSerializer(transactions, many=True)
     return Response(serializer.data)
+
+@api_view(['GET', 'PATCH'])
+def account_view(request):
+    """
+    Handles retrieval (GET) and updating (PATCH) of the authenticated user's account details.
+    Uses custom JWT authentication for Person model.
+    """
+    # Use custom authentication
+    auth = CustomJWTAuthentication()
+    try:
+        user, token = auth.authenticate(request)
+        if user is None:
+            return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+    except Exception as e:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    if request.method == 'GET':
+        serializer = PersonSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    elif request.method == 'PATCH':
+        # Use partial=True to allow updating only a subset of fields (like is_premium)
+        serializer = PersonSerializer(user, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

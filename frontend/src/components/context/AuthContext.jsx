@@ -44,6 +44,10 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.clear();
   };
+
+  if (loading) {
+    return <div>Loading Authentication...</div>; // <-- Ensure you return a loading state here
+  }
  
   return (
     <AuthContext.Provider value={{ login, logout, user, loading }}>

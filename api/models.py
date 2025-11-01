@@ -17,15 +17,13 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-
 class Person(models.Model):
     id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=100)
     income = models.IntegerField(default=0)
     password = models.CharField(max_length=255)  # hashed
-    birthday = models.DateField()
-    # Optional: is_premium field
+    birthday = models.DateField(null=True, blank=True)
     is_premium = models.BooleanField(default=False)
 
     def set_password(self, raw_password):
@@ -34,7 +32,6 @@ class Person(models.Model):
 
     def __str__(self):
         return self.username
-
 
 class Transaction(models.Model):
     user = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="transactions")
@@ -46,7 +43,6 @@ class Transaction(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.amount}"
-
 
 class SavingsGoal(models.Model):
     user = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="savings_goals")

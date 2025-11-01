@@ -133,7 +133,7 @@ function Main() {
                                 <td>{tx.description}</td>
                                 <td style={{width: '18%'}}>
                                     <button className="edit" onClick={() => handleEdit(tx)}><MdEdit /></button>
-                                    <button className="delete" onClick={() => handleDelete(tx.id)}><RiDeleteBin6Line onClick={() => handleDelete(tx.id)} /> </button>
+                                    <button className="delete" onClick={() => handleDelete(tx.id)}><RiDeleteBin6Line /> </button>
                                 </td>
                             </tr>
                         ))}

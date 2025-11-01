@@ -8,27 +8,32 @@ function Layout({ onAddTransaction, showTransaction, setShowTransaction, editing
     const { logout } = useAuth();
     const [showCategory, setShowCategory] = useState(false);
 
+    // Provide default functions if not passed as props
+    const handleSetEditingTransaction = setEditingTransaction || (() => {});
+    const handleSetShowTransaction = setShowTransaction || (() => {});
+
     return (
         <>
             <div className="navbar">
+                <nav><Link to="/main">Transactions</Link></nav>
                 <nav onClick={() => {
-                    setEditingTransaction(null);
-                    setShowTransaction(true);
+                    handleSetEditingTransaction(null);
+                    handleSetShowTransaction(true);
                 }}>Add new transaction</nav>
                 <nav><Link to="/main">Add new saving goal</Link></nav>
                 <nav onClick={() => setShowCategory(true)}>Add new category</nav>
-                <nav><Link to="">Account</Link></nav>
+                <nav><Link to="/account">Account</Link></nav>
                 <nav><Link to="">Set new limit</Link></nav>
                 <button onClick={logout}>Logout</button>
                 <Outlet />
             </div>
 
-            {showTransaction && (
+            {showTransaction && onAddTransaction && (
                 <NewTransaction
-                    onClose={() => setShowTransaction(false)}
+                    onClose={() => handleSetShowTransaction(false)}
                     onAdd={onAddTransaction}
                     editingTransaction={editingTransaction}
-                    setEditingTransaction={setEditingTransaction}
+                    setEditingTransaction={handleSetEditingTransaction}
                 />
             )}
 

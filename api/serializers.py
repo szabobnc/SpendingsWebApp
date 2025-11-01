@@ -38,3 +38,9 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'name', 'description']
+
+class PersonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Person
+        fields = ['id', 'username', 'name', 'income', 'birthday', 'is_premium']
+        read_only_fields = ['id', 'username', 'birthday']
