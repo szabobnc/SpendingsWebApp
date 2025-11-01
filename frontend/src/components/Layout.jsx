@@ -17,6 +17,8 @@ function Layout({ onAddTransaction, showTransaction, setShowTransaction, editing
                 }}>Add new transaction</nav>
                 <nav><Link to="/main">Add new saving goal</Link></nav>
                 <nav onClick={() => setShowCategory(true)}>Add new category</nav>
+                <nav><Link to="">Account</Link></nav>
+                <nav><Link to="">Set new limit</Link></nav>
                 <button onClick={logout}>Logout</button>
                 <Outlet />
             </div>

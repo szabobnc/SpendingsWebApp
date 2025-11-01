@@ -102,6 +102,7 @@ function Main() {
                 <div>
                     <TransactionPieChart data={transactions} />
                     <table className="tx-table">
+                        <tbody>
                         <tr>
                             <th colSpan="2">Current month's balance</th>
                         </tr>
@@ -116,13 +117,16 @@ function Main() {
                         <tr className={posAmount-negAmount > 0 ? "pos-tx" : "neg-tx"}>
                             <td colSpan="2">{posAmount-negAmount}</td>
                         </tr>
+                        </tbody>
                     </table>
                     <table className="tx-table">
+                        <tbody>
                         <tr>
                             <th colSpan="5">Transactions</th>
                         </tr>
                         {transactions.map(tx => (
-                            <tr className={tx.is_income ? "pos-tx" : "neg-tx"}>
+                            <tr key={tx.id}
+                            className={tx.is_income ? "pos-tx" : "neg-tx"}>
                                 <td>{new Date(tx.date).toISOString().split("T")[0]}</td>
                                 <td>{tx.is_income ? tx.amount : '-' + tx.amount}</td>
                                 <td>{tx.category_name}</td>
@@ -133,6 +137,7 @@ function Main() {
                                 </td>
                             </tr>
                         ))}
+                        </tbody>
                     </table>
                 </div>
             )}

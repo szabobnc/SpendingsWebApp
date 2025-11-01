@@ -12,6 +12,23 @@ code {
         monospace;
 }
 
+
+nav a {
+    text-decoration: none !important; 
+    color: white;
+
+}
+
+nav a:hover {
+    text-decoration: none !important;
+}
+
+nav a:link, 
+nav a:visited, 
+nav a:active {
+    color: white !important;
+    text-decoration: none !important;
+}
 .overlay {
     position: fixed;
     top: 0;
