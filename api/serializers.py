@@ -1,6 +1,6 @@
 # serializers.py
 from rest_framework import serializers
-from .models import Transaction, Person, Token, Category
+from .models import Transaction, Person, Token, Category, CategoryLimit
 from django.contrib.auth.hashers import make_password 
 
 class TokenSerializer(serializers.ModelSerializer):
@@ -77,3 +77,13 @@ class PersonSerializer(serializers.ModelSerializer):
         model = Person
         fields = ['id', 'username', 'name', 'income', 'birthday', 'is_premium']
         read_only_fields = ['id', 'username', 'birthday']
+
+class CategoryLimitSerializer(serializers.ModelSerializer):
+    category_name = serializers.CharField(source='category.name', read_only=True)
+    
+    class Meta:
+        model = CategoryLimit
+        fields = ['id', 'user', 'category', 'category_name', 'limit_amount', 'created_at', 'updated_at']
+        # --- CHANGE HERE ---
+        # Add 'user' to read_only_fields
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at']

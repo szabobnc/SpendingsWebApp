@@ -1,12 +1,17 @@
 from django.urls import path
-from .views import RegistrationView, LoginView, GetCategoriesView, TransactionCreateView ,account_view
+from .views import (
+    RegistrationView, 
+    LoginView, 
+    GetCategoriesView, 
+    TransactionCreateView,
+    account_view,
+    category_limit_list,
+    category_limit_detail,
+    check_category_spending
+)
 from rest_framework_simplejwt.views import TokenRefreshView
 from . import views
 from .views import transaction_list
-# urls.py (existing imports)
-from django.urls import path
-#from .views import RegistrationView, LoginView, GetCategoriesView, TransactionCreateView, account_view # <-- Add account_view here
-# ...
 
 urlpatterns = [
     path("register/", RegistrationView.as_view(), name="register"),
@@ -16,8 +21,11 @@ urlpatterns = [
     path("createTransaction/", TransactionCreateView.as_view(), name="create_transaction"),
     path('transactions/', transaction_list, name='transaction-list'),
     path('createCategory/', views.createCategory, name='createCategory'),
-    path('transactions/', views.transaction_list, name='transaction-list'),
     path('transactions/<int:pk>/', views.transaction_detail, name='transaction-detail'),
-    #path('account/', account_view, name='account'), # <-- This looks corre
-    path('account/', account_view, name='account'),  # Added the account endpoint
+    path('account/', account_view, name='account'),
+    
+    # Category Limit endpoints
+    path('category-limits/', category_limit_list, name='category-limit-list'),
+    path('category-limits/<int:pk>/', category_limit_detail, name='category-limit-detail'),
+    path('category-spending/<int:category_id>/', check_category_spending, name='check-category-spending'),
 ]
