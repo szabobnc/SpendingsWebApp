@@ -18,6 +18,7 @@ from .models import Transaction
 from .serializers import TransactionSerializer
 from rest_framework.permissions import IsAuthenticated
 from .authentication import CustomJWTAuthentication
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 
 @api_view(['GET', 'PATCH', 'DELETE'])
 def transaction_detail(request, pk):
@@ -57,7 +58,7 @@ class TransactionCreateView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class RegistrationView(APIView):
+'''class RegistrationView(APIView):
     def post(self, request, format=None):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
@@ -73,6 +74,33 @@ class RegistrationView(APIView):
             return Response(
                 {"success": False, "message": error},
                 status=status.HTTP_200_OK,
+            )'''
+
+class RegistrationView(APIView):
+    def post(self, request, format=None):
+        try:
+            serializer = RegisterSerializer(data=request.data)
+            if serializer.is_valid():
+                user = serializer.save()
+                return Response(
+                    {"success": True, "message": "You are now registered on our website!"},
+                    status=status.HTTP_201_CREATED,
+                )
+            else:
+                error_messages = []
+                for field, errors in serializer.errors.items():
+                    for error in errors:
+                        error_messages.append(f"{field}: {error}")
+                error_message = "; ".join(error_messages)
+                return Response(
+                    {"success": False, "message": error_message},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except Exception as e:
+            print(f"RRRRRRegistration error: {e}")
+            return Response(
+                {"success": False, "message": "Internal server error during registration"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
 class LoginView(APIView):
@@ -164,12 +192,37 @@ def account_view(request):
     """
     # Use custom authentication
     auth = CustomJWTAuthentication()
+    
     try:
-        user, token = auth.authenticate(request)
+        # Attempt to authenticate the request
+        auth_result = auth.authenticate(request)
+        
+        # If authentication returns None, no credentials were provided
+        if auth_result is None:
+            return Response(
+                {'error': 'Authentication credentials were not provided'}, 
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        user, token = auth_result
+        
+        # Double-check user is valid
         if user is None:
-            return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {'error': 'Invalid authentication credentials'}, 
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+            
+    except (InvalidToken, TokenError) as e:
+        return Response(
+            {'error': f'Invalid token: {str(e)}'}, 
+            status=status.HTTP_401_UNAUTHORIZED
+        )
     except Exception as e:
-        return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(
+            {'error': f'Authentication error: {str(e)}'}, 
+            status=status.HTTP_401_UNAUTHORIZED
+        )
     
     if request.method == 'GET':
         serializer = PersonSerializer(user)
