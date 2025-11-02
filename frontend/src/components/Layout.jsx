@@ -3,10 +3,12 @@ import { useAuth } from './context/AuthContext';
 import { useState } from "react";
 import NewTransaction from "./NewTransaction";
 import NewCategory from "./NewCategory"; 
+import SetLimit from "./SetLimit";
 
 function Layout({ onAddTransaction, showTransaction, setShowTransaction, editingTransaction, setEditingTransaction }) {
     const { logout } = useAuth();
     const [showCategory, setShowCategory] = useState(false);
+    const [showLimit, setShowLimit] = useState(false);
 
     // Provide default functions if not passed as props
     const handleSetEditingTransaction = setEditingTransaction || (() => {});
@@ -23,7 +25,7 @@ function Layout({ onAddTransaction, showTransaction, setShowTransaction, editing
                 <nav><Link to="/main">Add new saving goal</Link></nav>
                 <nav onClick={() => setShowCategory(true)}>Add new category</nav>
                 <nav><Link to="/account">Account</Link></nav>
-                <nav><Link to="">Set new limit</Link></nav>
+                <nav onClick={() => setShowLimit(true)}>Set new limit</nav>
                 <button onClick={logout}>Logout</button>
                 <Outlet />
             </div>
@@ -39,6 +41,10 @@ function Layout({ onAddTransaction, showTransaction, setShowTransaction, editing
 
             {showCategory && (
                 <NewCategory onClose={() => setShowCategory(false)} />
+            )}
+
+            {showLimit && (
+                <SetLimit onClose={() => setShowLimit(false)} />
             )}
         </>
     );
