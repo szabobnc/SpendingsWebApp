@@ -4,10 +4,13 @@ import Layout from "./Layout";
 import TransactionPieChart from "./PieChart";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdEdit } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 function Main() {
+    const navigate = useNavigate();
+
     const { user } = useAuth();
     const [transactions, setTransactions] = useState([]);
     const [loadingTransactions, setLoadingTransactions] = useState(true);
@@ -134,6 +137,9 @@ function Main() {
                             </tr>
                         ))}
                     </table>
+                    
+                    <button style={{ display: "block", margin: "0 auto" }} onClick={ e => navigate("/transactions")}>View all transaction</button>
+                    
                 </div>
             )}
         </div>
