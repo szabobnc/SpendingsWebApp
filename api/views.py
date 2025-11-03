@@ -146,3 +146,38 @@ def transaction_list(request):
     transactions = transactions.order_by('-date')
     serializer = TransactionSerializer(transactions, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+def transaction_history(request):
+
+    user_id = request.GET.get('user_id')
+    amount = request.GET.get('amount')
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    description = request.GET.get('description')
+    is_income = request.GET.get('is_income')
+    category_id = request.GET.get('category_id')
+
+    queryset = Transaction.objects.filter(user_id=user_id)
+
+    if amount:
+        queryset = queryset.filter(amount=amount)
+
+    if date_from:
+        queryset = queryset.filter(date__date__gte=date_from)
+
+    if date_to:
+        queryset = queryset.filter(date__date__lte=date_to)
+
+    if description:
+        queryset = queryset.filter(description__icontains=description)
+
+    if is_income in ['0', '1']:
+        queryset = queryset.filter(is_income=bool(int(is_income)))
+
+    if category_id:
+        queryset = queryset.filter(category_id=category_id)
+
+    serializer = TransactionSerializer(queryset, many=True)
+    return Response({'data': serializer.data})
