@@ -1,4 +1,4 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from './context/AuthContext';
 import { useState } from "react";
 import NewTransaction from "./NewTransaction";
@@ -7,10 +7,12 @@ import NewCategory from "./NewCategory";
 function Layout({ onAddTransaction, showTransaction, setShowTransaction, editingTransaction, setEditingTransaction }) {
     const { logout } = useAuth();
     const [showCategory, setShowCategory] = useState(false);
+    const navigate = useNavigate();
 
     return (
         <>
             <div className="navbar">
+                <nav onClick={() => navigate("/main")}>Home</nav>
                 <nav onClick={() => {
                     setEditingTransaction(null);
                     setShowTransaction(true);
