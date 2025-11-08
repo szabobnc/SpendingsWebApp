@@ -5,6 +5,7 @@ import TransactionPieChart from "./PieChart";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -32,6 +33,16 @@ function Main() {
             });
             if (!res.ok) throw new Error("Failed to delete transaction");
             setTransactions(transactions.filter(tx => tx.id !== id));
+            toast.success('Transaction deleted successfully!', {
+                                position: "top-center",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: false,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored"
+                            });
         } catch (err) {
             console.error(err);
         }
@@ -71,6 +82,7 @@ function Main() {
 
     return (
         <div>
+            <ToastContainer />
             <Layout
                 onAddTransaction={(tx) => {
                     // Update list after add/edit

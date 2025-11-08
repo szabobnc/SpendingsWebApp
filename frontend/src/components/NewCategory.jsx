@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -16,6 +17,16 @@ function NewCategory({ onClose }) {
     setIsLoading(true);
     try {
       await axios.post(`${apiUrl}api/createCategory/`, details);
+      toast.success('Category created successfully!', {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored"
+      });
       onClose(); // Close the modal after success
     } catch (err) {
       console.error("Failed to create category:", err);

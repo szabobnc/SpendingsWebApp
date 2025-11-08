@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
 import { useAuth } from "./context/AuthContext";
 import axios from "axios";
 
@@ -62,8 +63,28 @@ function NewTransaction({ onClose, onAdd, editingTransaction, setEditingTransact
             let res;
             if (editingTransaction) {
                 res = await axios.patch(`${apiUrl}api/transactions/${editingTransaction.id}/`, details);
+                toast.success('Transaction modified successfully!', {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored"
+                });
             } else {
                 res = await axios.post(`${apiUrl}api/createTransaction/`, details);
+                toast.success('Transaction created successfully!', {
+                    position: "top-center",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored"
+                });
             }
 
             onAdd(res.data);
@@ -80,6 +101,7 @@ function NewTransaction({ onClose, onAdd, editingTransaction, setEditingTransact
     if (isLoading) return <div>Loading...</div>;
 
     return (
+        <>
         <div className="overlay">
             <div className="modal">
                 <fieldset>
@@ -87,26 +109,26 @@ function NewTransaction({ onClose, onAdd, editingTransaction, setEditingTransact
                         <h1>{editingTransaction ? "Edit Transaction" : "Create Transaction"}</h1>
 
                         <label>
-                            <input type="radio" name="is_income" value="true" checked={details.is_income === 'true'} onChange={e => setDetails({...details, is_income: e.target.value})} required/>
+                            <input type="radio" name="is_income" value="true" checked={details.is_income === 'true'} onChange={e => setDetails({ ...details, is_income: e.target.value })} required />
                             Income
                         </label>
 
                         <label>
-                            <input type="radio" name="is_income" value="false" checked={details.is_income === 'false'} onChange={e => setDetails({...details, is_income: e.target.value})} required/>
+                            <input type="radio" name="is_income" value="false" checked={details.is_income === 'false'} onChange={e => setDetails({ ...details, is_income: e.target.value })} required />
                             Expense
                         </label>
 
                         <label>Category</label>
-                        <select value={details.category} onChange={e => setDetails({...details, category: e.target.value})} required>
+                        <select value={details.category} onChange={e => setDetails({ ...details, category: e.target.value })} required>
                             <option value="">Choose a category</option>
                             {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                         </select>
 
                         <label>Amount</label>
-                        <input type="number" value={details.amount} onChange={e => setDetails({...details, amount: e.target.value})} required/>
+                        <input type="number" value={details.amount} onChange={e => setDetails({ ...details, amount: e.target.value })} required />
 
                         <label>Description</label>
-                        <input type="text" value={details.description} onChange={e => setDetails({...details, description: e.target.value})} required/>
+                        <input type="text" value={details.description} onChange={e => setDetails({ ...details, description: e.target.value })} required />
 
                         <button type="submit">{editingTransaction ? "Save Changes" : "Create"}</button>
                         <button type="button" onClick={onClose}>Close</button>
@@ -114,6 +136,7 @@ function NewTransaction({ onClose, onAdd, editingTransaction, setEditingTransact
                 </fieldset>
             </div>
         </div>
+        </>
     );
 }
 

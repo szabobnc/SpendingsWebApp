@@ -7,6 +7,8 @@ import ProtectedRoute from "./ProtectedRoute";
 import NewTransaction from "./NewTransaction";
 import NewCategory from "./NewCategory";
 import Transactions from "./Transactions";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
 
@@ -26,6 +28,7 @@ const App = () => {
 
         </Routes>
       </AuthProvider>
+      <ToastContainer />
     </Router>
   )
 
