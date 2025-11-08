@@ -53,3 +53,16 @@ class SavingsGoal(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.user.username})"
+
+class CategoryLimit(models.Model):
+    user = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='category_limits')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    limit_amount = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('user', 'category')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.category.name}: {self.limit_amount}"

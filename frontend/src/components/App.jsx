@@ -10,28 +10,32 @@ import AccountPage from './AccountPage';
 import Transactions from "./Transactions";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ThemeProvider } from './ThemeProvider';
 
 const App = () => {
 
   return (
-    <Router>
-      <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route element={<ProtectedRoute />}>
+    <ThemeProvider defaultTheme="light" storageKey="expense-tracker-theme">
+      <Router>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/newTransaction" element={<NewTransaction />} />
+            <Route path="/NewCategory" element={<NewCategory />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/newTransaction" element={<NewTransaction />} />
             <Route path="/NewCategory" element={<NewCategory />} />
             <Route path="/main" element={<Main />} />
             <Route path="/account" element={<AccountPage />}/>
             <Route path="/transactions" element={<Transactions />} />
-          </Route>
-
-        </Routes>
-      </AuthProvider>
-      <ToastContainer />
-    </Router>
+            </Route>
+            
+          </Routes>
+        </AuthProvider>
+      </Router>
+    </ThemeProvider>
   )
 
 }

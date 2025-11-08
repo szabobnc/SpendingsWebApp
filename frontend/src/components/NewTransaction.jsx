@@ -9,6 +9,7 @@ function NewTransaction({ onClose, onAdd, editingTransaction, setEditingTransact
     const { user, loading } = useAuth();
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [limitWarning, setLimitWarning] = useState(null);
 
     const [details, setDetails] = useState({
         user: '',
@@ -57,8 +58,67 @@ function NewTransaction({ onClose, onAdd, editingTransaction, setEditingTransact
         }
     }, [editingTransaction, user]);
 
+    // Check spending limit when category or amount changes
+    useEffect(() => {
+        const checkLimit = async () => {
+            if (details.category && details.amount && details.is_income === 'false') {
+                try {
+                    const token = localStorage.getItem("access_token");
+                    const res = await axios.get(
+                        `${apiUrl}api/category-spending/${details.category}/`,
+                        {
+                            headers: { Authorization: `Bearer ${token}` },
+                        }
+                    );
+
+                    if (res.data.has_limit) {
+                        const newTotal = res.data.total_spent + parseInt(details.amount);
+                        const newPercentage = (newTotal / res.data.limit_amount) * 100;
+
+                        if (newTotal > res.data.limit_amount) {
+                            setLimitWarning({
+                                type: 'exceeded',
+                                message: `⚠️ WARNING: This transaction will exceed your ${res.data.category_name} limit by ${newTotal - res.data.limit_amount} Ft!`,
+                                data: res.data
+                            });
+                        } else if (newPercentage >= 80) {
+                            setLimitWarning({
+                                type: 'warning',
+                                message: `⚠️ CAUTION: This transaction will bring you to ${newPercentage.toFixed(1)}% of your ${res.data.category_name} limit.`,
+                                data: res.data
+                            });
+                        } else {
+                            setLimitWarning(null);
+                        }
+                    } else {
+                        setLimitWarning(null);
+                    }
+                } catch (err) {
+                    // User might not be premium or no limit set
+                    setLimitWarning(null);
+                }
+            } else {
+                setLimitWarning(null);
+            }
+        };
+
+        const debounceTimer = setTimeout(checkLimit, 500);
+        return () => clearTimeout(debounceTimer);
+    }, [details.category, details.amount, details.is_income]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Show confirmation if limit is exceeded
+        if (limitWarning?.type === 'exceeded') {
+            const confirmed = window.confirm(
+                `${limitWarning.message}\n\nDo you want to proceed anyway?`
+            );
+            if (!confirmed) {
+                return;
+            }
+        }
+
         try {
             let res;
             if (editingTransaction) {
@@ -87,6 +147,16 @@ function NewTransaction({ onClose, onAdd, editingTransaction, setEditingTransact
                 });
             }
 
+            // Show limit warning if present in response
+            if (res.data.limit_check) {
+                const check = res.data.limit_check;
+                if (check.exceeded) {
+                    alert(`⚠️ You have exceeded your limit for this category!\nLimit: ${check.limit_amount}\nTotal Spent: ${check.total_spent} Ft\nOver by: ${check.total_spent - check.limit_amount} Ft`);
+                } else if (check.warning) {
+                    alert(`⚠️ Warning: You have used ${check.percentage}% of your limit for this category.\nLimit: ${check.limit_amount} Ft\nRemaining: ${check.remaining} t`);
+                }
+            }
+
             onAdd(res.data);
 
             // Clear edit state
@@ -95,6 +165,7 @@ function NewTransaction({ onClose, onAdd, editingTransaction, setEditingTransact
             onClose();
         } catch (err) {
             console.error(err);
+            alert("Failed to save transaction. Please try again.");
         }
     };
 
@@ -126,6 +197,20 @@ function NewTransaction({ onClose, onAdd, editingTransaction, setEditingTransact
 
                         <label>Amount</label>
                         <input type="number" value={details.amount} onChange={e => setDetails({ ...details, amount: e.target.value })} required />
+
+                        {limitWarning && (
+                            <div style={{
+                                padding: '10px',
+                                marginTop: '10px',
+                                marginBottom: '10px',
+                                backgroundColor: limitWarning.type === 'exceeded' ? '#ffebee' : '#fff3e0',
+                                border: `2px solid ${limitWarning.type === 'exceeded' ? '#f44336' : '#ff9800'}`,
+                                borderRadius: '4px',
+                                color: limitWarning.type === 'exceeded' ? '#c62828' : '#e65100'
+                            }}>
+                                {limitWarning.message}
+                            </div>
+                        )}
 
                         <label>Description</label>
                         <input type="text" value={details.description} onChange={e => setDetails({ ...details, description: e.target.value })} required />
