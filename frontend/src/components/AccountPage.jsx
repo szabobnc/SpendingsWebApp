@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useAuth } from "./context/AuthContext";
 import SimpleLayout from "./SimpleLayout";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
@@ -20,6 +20,7 @@ function AccountPage() {
 
     const navigate = useNavigate()
     const location = useLocation();
+    const handleRef = useRef(false);
 
 
     // --- Fetch Account Details on Load ---
@@ -216,9 +217,10 @@ function AccountPage() {
     }
 
     useEffect(() => {
-        console.log("state:", location.state)
-        if (location.state?.paymentSuccess) {
+        if (location.state?.paymentSuccess && !handleRef.current) {
             activatePremium();
+            handleRef.current = true;
+            navigate(location.pathname, { replace: true, state: {} });
         }
     }, [location.state]);
 
