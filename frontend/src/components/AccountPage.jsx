@@ -11,6 +11,10 @@ function AccountPage() {
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
     const [error, setError] = useState(null);
+    const [transactions, setTransactions] = useState([]);
+    const [loadingTransactions, setLoadingTransactions] = useState(true);
+    const [editingIncome, setEditingIncome] = useState(false);
+    const [newIncome, setNewIncome] = useState('');
 
     // --- Fetch Account Details on Load ---
     const fetchAccount = useCallback(async () => {
@@ -47,6 +51,7 @@ function AccountPage() {
             
             const data = await response.json();
             setAccount(data);
+            setNewIncome(data.income || 0);
         } catch (err) {
             console.error('Error fetching account:', err);
             setError(err.message);
@@ -55,12 +60,67 @@ function AccountPage() {
         }
     }, [logout]);
 
+    // Fetch transactions to calculate balance
+    useEffect(() => {
+        if (!user) return;
+        const fetchTransactions = async () => {
+            try {
+                const current = new Date();
+                const res = await fetch(`${apiUrl}api/transactions/?user_id=${user.id}&date=${current.getMonth()}`);
+                if (!res.ok) throw new Error("Failed to fetch transactions");
+                const data = await res.json();
+                setTransactions(data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoadingTransactions(false);
+            }
+        };
+        fetchTransactions();
+    }, [user]);
+
     useEffect(() => {
         // Fetch only if user object exists (meaning they logged in)
         if (user) {
             fetchAccount();
         }
     }, [user, fetchAccount]);
+
+    // --- Update Monthly Income ---
+    const updateIncome = async () => {
+        if (!account) return;
+        setUpdating(true);
+        setError(null);
+
+        try {
+            const token = localStorage.getItem('access_token');
+            const res = await fetch(`${apiUrl}api/account/`, {
+                method: "PATCH",
+                headers: {
+                    'Content-Type': "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ income: parseInt(newIncome) }),
+            });
+
+            if (!res.ok) {
+                if (res.status === 401) {
+                    logout();
+                    throw new Error('Session expired. Please log in again.');
+                }
+                throw new Error("Failed to update income");
+            }
+
+            const data = await res.json();
+            setAccount(data);
+            setEditingIncome(false);
+        } catch (err) {
+            console.error(err);
+            setError(err.message);
+        } finally {
+            setUpdating(false);
+        }
+    };
 
     // --- Toggle Premium Status (PATCH Request) ---
     const togglePremium = async () => {
@@ -100,6 +160,17 @@ function AccountPage() {
         }
     };
 
+    // Calculate balance components
+    const monthlyIncome = account?.income || 0;
+    const extraIncome = transactions
+        .filter(tx => tx.is_income)
+        .reduce((sum, tx) => sum + tx.amount, 0);
+    const expenses = transactions
+        .filter(tx => !tx.is_income)
+        .reduce((sum, tx) => sum + tx.amount, 0);
+    const totalIncome = monthlyIncome + extraIncome;
+    const balance = totalIncome - expenses;
+
     if (loading) return <SimpleLayout><p>Loading account details...</p></SimpleLayout>;
     if (error) return <SimpleLayout><p className="error-message">Error: {error}</p></SimpleLayout>;
     if (!account) return <SimpleLayout><p>No account data available.</p></SimpleLayout>;
@@ -112,7 +183,48 @@ function AccountPage() {
                 <div className="account-card">
                     <p><strong>Username:</strong> {account.username}</p>
                     <p><strong>Name:</strong> {account.name}</p>
-                    <p><strong>Income:</strong> ${account.income ? account.income.toFixed(2) : '0.00'}</p>
+                    
+                    <p>
+                        <strong>Monthly Income:</strong> 
+                        {editingIncome ? (
+                            <span style={{marginLeft: '10px'}}>
+                                <input 
+                                    type="number" 
+                                    value={newIncome} 
+                                    onChange={(e) => setNewIncome(e.target.value)}
+                                    style={{width: '100px', marginRight: '10px'}}
+                                />
+                                <button onClick={updateIncome} disabled={updating}>
+                                    {updating ? 'Saving...' : 'Save'}
+                                </button>
+                                <button onClick={() => {
+                                    setEditingIncome(false);
+                                    setNewIncome(account.income || 0);
+                                }} style={{marginLeft: '5px'}}>
+                                    Cancel
+                                </button>
+                            </span>
+                        ) : (
+                            <span>
+                                <span className="pos-tx" style={{marginLeft: '10px'}}>{monthlyIncome.toFixed(2)} Ft</span>
+                                <button 
+                                    onClick={() => setEditingIncome(true)}
+                                    style={{marginLeft: '10px', fontSize: '12px', padding: '2px 8px'}}
+                                >
+                                    Edit
+                                </button>
+                            </span>
+                        )}
+                    </p>
+
+                    {extraIncome > 0 && (
+                        <p><strong>Extra Income (This Month):</strong> <span className="pos-tx">{extraIncome.toFixed(2)} Ft</span></p>
+                    )}
+                    <p><strong>Total Income:</strong> <span className="pos-tx">{totalIncome.toFixed(2)} Ft</span></p>
+                    <p><strong>Total Expenses:</strong> <span className="neg-tx">{expenses.toFixed(2)} Ft</span></p>
+                    <p><strong>Balance:</strong> <span className={balance >= 0 ? "pos-tx" : "neg-tx"}>
+                        {loadingTransactions ? 'Calculating...' : balance.toFixed(2)} Ft
+                    </span></p>
                     <p><strong>Birthday:</strong> {account.birthday || 'Not set'}</p>
                     <p>
                         <strong>Premium:</strong> {account.is_premium ? "Yes" : "No"}

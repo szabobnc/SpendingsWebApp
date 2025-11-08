@@ -15,9 +15,11 @@ function Main() {
     const { user } = useAuth();
     const [transactions, setTransactions] = useState([]);
     const [loadingTransactions, setLoadingTransactions] = useState(true);
+    const [account, setAccount] = useState(null);
+    const [loadingAccount, setLoadingAccount] = useState(true);
 
-    const [posAmount, setPosAmount] = useState(0)
-    const [negAmount, setNegAmount] = useState(0)
+    const [extraIncome, setExtraIncome] = useState(0);
+    const [negAmount, setNegAmount] = useState(0);
 
     const current = new Date();
 
@@ -48,13 +50,40 @@ function Main() {
         }
     };
 
-
     // Edit a transaction
     const handleEdit = (tx) => {
         setEditingTransaction(tx);
         setShowTransaction(true);
     };
 
+    // Fetch account details to get monthly income
+    useEffect(() => {
+        if (!user) return;
+        const fetchAccount = async () => {
+            try {
+                const token = localStorage.getItem('access_token');
+                if (!token) return;
+
+                const response = await fetch(`${apiUrl}api/account/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setAccount(data);
+                }
+            } catch (err) {
+                console.error('Error fetching account:', err);
+            } finally {
+                setLoadingAccount(false);
+            }
+        };
+        fetchAccount();
+    }, [user]);
 
     // Fetch transactions
     useEffect(() => {
@@ -72,13 +101,18 @@ function Main() {
             }
         };
         fetchTransactions();
-
     }, [user]);
 
-        useEffect(() => {
-            setPosAmount(transactions.filter(e => e.is_income).map(e => e.amount).reduce(function (x,y) { return x+y }, 0))
-            setNegAmount(transactions.filter(e => !e.is_income).map(e => e.amount).reduce(function (x,y) { return x+y }, 0))
+    // Calculate extra income and expenses from transactions
+    useEffect(() => {
+        setExtraIncome(transactions.filter(e => e.is_income).map(e => e.amount).reduce(function (x,y) { return x+y }, 0));
+        setNegAmount(transactions.filter(e => !e.is_income).map(e => e.amount).reduce(function (x,y) { return x+y }, 0));
     }, [transactions]);
+
+    // Calculate total income and balance
+    const monthlyIncome = account?.income || 0;
+    const totalIncome = monthlyIncome + extraIncome;
+    const balance = totalIncome - negAmount;
 
     return (
         <div>
@@ -105,17 +139,16 @@ function Main() {
                 setEditingTransaction={setEditingTransaction}
             />
 
-            <h1>Main page</h1>
-            <h2>Hello {user?.name}!</h2>
+            <h1>Transaction details</h1>
+            <h2>Welcome {user?.name}!</h2>
             
             <h3>Transactions in this month</h3>
-            {loadingTransactions ? (
+            {loadingTransactions || loadingAccount ? (
                 <p>Loading...</p>
-            ) : transactions.length === 0 ? (
-                <p>No transactions yet.</p>
             ) : (
                 <div>
-                    <TransactionPieChart data={transactions} />
+                    {transactions.length > 0 && <TransactionPieChart data={transactions} />}
+                    
                     <table className="tx-table">
                         <tbody>
                         <tr>
@@ -123,37 +156,73 @@ function Main() {
                         </tr>
                         <tr>
                             <td className="pos-tx">
-                                {posAmount}
+                                {totalIncome}
                             </td>
                             <td className="neg-tx">
                                 -{negAmount}
                             </td>
                         </tr>
-                        <tr className={posAmount-negAmount > 0 ? "pos-tx" : "neg-tx"}>
-                            <td colSpan="2">{posAmount-negAmount}</td>
+                        <tr className={balance > 0 ? "pos-tx" : "neg-tx"}>
+                            <td colSpan="2">{balance}</td>
                         </tr>
                         </tbody>
                     </table>
-                    <table className="tx-table">
+                    
+                    {/* Show breakdown of income sources */}
+                    <table className="tx-table" style={{marginTop: '10px'}}>
                         <tbody>
                         <tr>
-                            <th colSpan="5">Transactions</th>
+                            <th colSpan="2">Income Breakdown</th>
                         </tr>
-                        {transactions.map(tx => (
-                            <tr key={tx.id}
-                            className={tx.is_income ? "pos-tx" : "neg-tx"}>
-                                <td>{new Date(tx.date).toISOString().split("T")[0]}</td>
-                                <td>{tx.is_income ? tx.amount : '-' + tx.amount}</td>
-                                <td>{tx.category_name}</td>
-                                <td>{tx.description}</td>
-                                <td style={{width: '18%'}}>
-                                    <button className="edit" onClick={() => handleEdit(tx)}><MdEdit /></button>
-                                    <button className="delete" onClick={() => handleDelete(tx.id)}><RiDeleteBin6Line /> </button>
-                                </td>
+                        <tr>
+                            <td>Monthly Income</td>
+                            <td className="pos-tx">{monthlyIncome}</td>
+                        </tr>
+                        {extraIncome > 0 && (
+                            <tr>
+                                <td>Extra Income (This Month)</td>
+                                <td className="pos-tx">{extraIncome}</td>
                             </tr>
-                        ))}
+                        )}
+                        <tr style={{fontWeight: 'bold'}}>
+                            <td>Total Income</td>
+                            <td className="pos-tx">{totalIncome}</td>
+                        </tr>
+                        <tr style={{fontWeight: 'bold'}}>
+                            <td>Total Expenses</td>
+                            <td className="neg-tx">{negAmount}</td>
+                        </tr>
+                        <tr style={{fontWeight: 'bold', fontSize: '1.1em'}}>
+                            <td>Balance</td>
+                            <td className={balance > 0 ? "pos-tx" : "neg-tx"}>{balance}</td>
+                        </tr>
                         </tbody>
                     </table>
+
+                    {transactions.length === 0 ? (
+                        <p>No transactions yet.</p>
+                    ) : (
+                        <table className="tx-table">
+                            <tbody>
+                            <tr>
+                                <th colSpan="5">Transactions</th>
+                            </tr>
+                            {transactions.map(tx => (
+                                <tr key={tx.id}
+                                className={tx.is_income ? "pos-tx" : "neg-tx"}>
+                                    <td>{new Date(tx.date).toISOString().split("T")[0]}</td>
+                                    <td>{tx.is_income ? tx.amount : '-' + tx.amount}</td>
+                                    <td>{tx.category_name}</td>
+                                    <td>{tx.description}</td>
+                                    <td style={{width: '18%'}}>
+                                        <button className="edit" onClick={() => handleEdit(tx)}><MdEdit /></button>
+                                        <button className="delete" onClick={() => handleDelete(tx.id)}><RiDeleteBin6Line /> </button>
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    )}
                     
                     <button style={{ display: "block", margin: "0 auto" }} onClick={ e => navigate("/transactions")}>View all transaction</button>
                     

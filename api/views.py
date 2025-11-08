@@ -3,10 +3,10 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import TransactionSerializer, RegisterSerializer, CategorySerializer, PersonSerializer
+from .serializers import TransactionSerializer, RegisterSerializer, CategorySerializer, PersonSerializer, CategoryLimitSerializer
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Person, Token, Category, Transaction
+from .models import Person, Token, Category, Transaction, CategoryLimit
 from datetime import datetime, timedelta
 import hashlib
 import uuid
@@ -19,6 +19,7 @@ from .serializers import TransactionSerializer
 from rest_framework.permissions import IsAuthenticated
 from .authentication import CustomJWTAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from django.db.models import Sum
 
 @api_view(['GET', 'PATCH', 'DELETE'])
 def transaction_detail(request, pk):
@@ -54,7 +55,46 @@ class TransactionCreateView(APIView):
 
         serializer = TransactionSerializer(data=data)
         if serializer.is_valid():
-            serializer.save(user=user)  # associate transaction with logged-in user
+            transaction = serializer.save(user=user)
+            
+            # Check if this is an expense and if user has premium and category limit set
+            if not transaction.is_income and transaction.category and user.is_premium:
+                # Get the current month's start and end
+                now = timezone.now()
+                month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+                
+                # Check if there's a limit for this category
+                try:
+                    category_limit = CategoryLimit.objects.get(user=user, category=transaction.category)
+                    
+                    # Calculate total spending in this category for current month
+                    total_spent = Transaction.objects.filter(
+                        user=user,
+                        category=transaction.category,
+                        is_income=False,
+                        date__gte=month_start
+                    ).aggregate(total=Sum('amount'))['total'] or 0
+                    
+                    # Check if limit is exceeded
+                    limit_amount = category_limit.limit_amount
+                    percentage = (total_spent / limit_amount) * 100 if limit_amount > 0 else 0
+                    
+                    response_data = serializer.data
+                    response_data['limit_check'] = {
+                        'has_limit': True,
+                        'limit_amount': limit_amount,
+                        'total_spent': total_spent,
+                        'remaining': limit_amount - total_spent,
+                        'percentage': round(percentage, 2),
+                        'exceeded': total_spent > limit_amount,
+                        'warning': percentage >= 80
+                    }
+                    
+                    return Response(response_data, status=status.HTTP_201_CREATED)
+                    
+                except CategoryLimit.DoesNotExist:
+                    pass
+            
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -307,3 +347,224 @@ def account_view(request):
             return Response(serializer.data, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Category Limit Views
+@api_view(['GET', 'POST'])
+def category_limit_list(request):
+    """
+    GET: List all category limits for the authenticated user
+    POST: Create a new category limit
+    """
+    auth = CustomJWTAuthentication()
+    
+    try:
+        auth_result = auth.authenticate(request)
+        if auth_result is None:
+            return Response(
+                {'error': 'Authentication credentials were not provided'}, 
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        user, token = auth_result
+        
+        if user is None:
+            return Response(
+                {'error': 'Invalid authentication credentials'}, 
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+            
+    except (InvalidToken, TokenError) as e:
+        return Response(
+            {'error': f'Invalid token: {str(e)}'}, 
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+    
+    # Check if user is premium
+    if not user.is_premium:
+        return Response(
+            {'error': 'This feature is only available for premium users'}, 
+            status=status.HTTP_403_FORBIDDEN
+        )
+    
+    if request.method == 'GET':
+        limits = CategoryLimit.objects.filter(user=user)
+        serializer = CategoryLimitSerializer(limits, many=True)
+        
+        # Add spending info for each limit
+        now = timezone.now()
+        month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        
+        limits_data = []
+        for limit_data in serializer.data:
+            category_id = limit_data['category']
+            total_spent = Transaction.objects.filter(
+                user=user,
+                category_id=category_id,
+                is_income=False,
+                date__gte=month_start
+            ).aggregate(total=Sum('amount'))['total'] or 0
+            
+            limit_amount = limit_data['limit_amount']
+            percentage = (total_spent / limit_amount) * 100 if limit_amount > 0 else 0
+            
+            limit_data['current_spending'] = {
+                'total_spent': total_spent,
+                'remaining': limit_amount - total_spent,
+                'percentage': round(percentage, 2),
+                'exceeded': total_spent > limit_amount,
+                'warning': percentage >= 80
+            }
+            limits_data.append(limit_data)
+        
+        return Response(limits_data, status=status.HTTP_200_OK)
+    
+    elif request.method == 'POST':
+        data = request.data.copy()
+        # The user is already authenticated and available as 'user'
+        
+        # Check if limit already exists for this category
+        category_id = data.get('category')
+        existing_limit = CategoryLimit.objects.filter(user=user, category_id=category_id).first()
+        
+        if existing_limit:
+            # Update existing limit
+            serializer = CategoryLimitSerializer(existing_limit, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save(user=user) # Pass user explicitly
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # Create new limit
+            serializer = CategoryLimitSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save(user=user) # Pass user explicitly
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PATCH', 'DELETE'])
+def category_limit_detail(request, pk):
+    """
+    GET: Retrieve a specific category limit
+    PATCH: Update a category limit
+    DELETE: Delete a category limit
+    """
+    auth = CustomJWTAuthentication()
+    
+    try:
+        auth_result = auth.authenticate(request)
+        if auth_result is None:
+            return Response(
+                {'error': 'Authentication credentials were not provided'}, 
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        user, token = auth_result
+        
+        if user is None:
+            return Response(
+                {'error': 'Invalid authentication credentials'}, 
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+            
+    except (InvalidToken, TokenError) as e:
+        return Response(
+            {'error': f'Invalid token: {str(e)}'}, 
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+    
+    try:
+        limit = CategoryLimit.objects.get(pk=pk, user=user)
+    except CategoryLimit.DoesNotExist:
+        return Response(
+            {'error': 'Category limit not found'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    if request.method == 'GET':
+        serializer = CategoryLimitSerializer(limit)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    elif request.method == 'PATCH':
+        serializer = CategoryLimitSerializer(limit, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    elif request.method == 'DELETE':
+        limit.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['GET'])
+def check_category_spending(request, category_id):
+    """
+    Check current spending against limit for a specific category
+    """
+    auth = CustomJWTAuthentication()
+    
+    try:
+        auth_result = auth.authenticate(request)
+        if auth_result is None:
+            return Response(
+                {'error': 'Authentication credentials were not provided'}, 
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        user, token = auth_result
+        
+        if user is None:
+            return Response(
+                {'error': 'Invalid authentication credentials'}, 
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+            
+    except (InvalidToken, TokenError) as e:
+        return Response(
+            {'error': f'Invalid token: {str(e)}'}, 
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+    
+    try:
+        category = Category.objects.get(id=category_id)
+    except Category.DoesNotExist:
+        return Response(
+            {'error': 'Category not found'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    # Get current month's spending
+    now = timezone.now()
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    
+    total_spent = Transaction.objects.filter(
+        user=user,
+        category=category,
+        is_income=False,
+        date__gte=month_start
+    ).aggregate(total=Sum('amount'))['total'] or 0
+    
+    # Check if there's a limit
+    try:
+        limit = CategoryLimit.objects.get(user=user, category=category)
+        limit_amount = limit.limit_amount
+        percentage = (total_spent / limit_amount) * 100 if limit_amount > 0 else 0
+        
+        return Response({
+            'category_id': category_id,
+            'category_name': category.name,
+            'has_limit': True,
+            'limit_amount': limit_amount,
+            'total_spent': total_spent,
+            'remaining': limit_amount - total_spent,
+            'percentage': round(percentage, 2),
+            'exceeded': total_spent > limit_amount,
+            'warning': percentage >= 80
+        }, status=status.HTTP_200_OK)
+        
+    except CategoryLimit.DoesNotExist:
+        return Response({
+            'category_id': category_id,
+            'category_name': category.name,
+            'has_limit': False,
+            'total_spent': total_spent
+        }, status=status.HTTP_200_OK)

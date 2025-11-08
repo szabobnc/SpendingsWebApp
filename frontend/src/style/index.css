@@ -26,7 +26,6 @@ nav a:hover {
 nav a:link, 
 nav a:visited, 
 nav a:active {
-    color: white !important;
     text-decoration: none !important;
 }
 .overlay {
@@ -245,11 +244,11 @@ th {
 
 
 tr:nth-child(even) {
-    background-color: #f9fcff;
+    background-color: #575a5e;
 }
 
 tr:hover {
-    background-color: #eef7ff;
+    background-color: #2672b4;
     transition: background-color 0.2s ease;
 }
 
