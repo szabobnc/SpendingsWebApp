@@ -1,7 +1,28 @@
 import { Chart } from "react-google-charts";
+import { useEffect, useState } from "react";
 
 function TransactionPieChart({ data }) {
     console.log(data);
+    const [isDark, setIsDark] = useState(false);
+
+    // Detect theme changes
+    useEffect(() => {
+        const checkTheme = () => {
+            const theme = document.documentElement.getAttribute('data-theme');
+            setIsDark(theme === 'dark');
+        };
+        
+        checkTheme();
+        
+        // Watch for theme changes
+        const observer = new MutationObserver(checkTheme);
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme']
+        });
+        
+        return () => observer.disconnect();
+    }, []);
 
     if (!data || data.length === 0) {
         return <div>No transaction data available for charts.</div>;
@@ -23,12 +44,37 @@ function TransactionPieChart({ data }) {
 
     const incomeData = [["Category", "Amount"], ...Object.entries(incomeTotals)];
 
-    const incomeOption = {
-        title: "Extrca income by category",
-    };
-    const expenseOption = {
-        title: "Expense by category",
-    };
+    // Chart options that adapt to theme
+    const getChartOptions = (title) => ({
+        title: title,
+        backgroundColor: isDark ? '#1e293b' : '#ffffff',
+        titleTextStyle: {
+            color: isDark ? '#f8fafc' : '#0f172a',
+            fontSize: 16,
+            bold: true
+        },
+        legend: {
+            textStyle: {
+                color: isDark ? '#cbd5e1' : '#475569',
+                fontSize: 12
+            }
+        },
+        pieSliceTextStyle: {
+            color: isDark ? '#ffffff' : '#000000',
+        },
+        chartArea: {
+            width: '90%',
+            height: '75%'
+        },
+        tooltip: {
+            textStyle: {
+                color: isDark ? '#0f172a' : '#0f172a'
+            }
+        }
+    });
+
+    const incomeOption = getChartOptions("Extra income by category");
+    const expenseOption = getChartOptions("Expense by category");
 
     return (
         <div className="charts">
@@ -38,7 +84,7 @@ function TransactionPieChart({ data }) {
                     data={incomeData}
                     options={incomeOption}
                     width={"100%"}
-                    height={"400px"}
+                    height={"350px"}
                 />
             )}
             {expenseData.length > 1 && (
@@ -47,7 +93,7 @@ function TransactionPieChart({ data }) {
                     data={expenseData}
                     options={expenseOption}
                     width={"100%"}
-                    height={"400px"}
+                    height={"350px"}
                 />
             )}
         </div>

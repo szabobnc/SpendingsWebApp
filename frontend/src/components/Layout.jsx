@@ -4,6 +4,7 @@ import { useState } from "react";
 import NewTransaction from "./NewTransaction";
 import NewCategory from "./NewCategory"; 
 import SetLimit from "./SetLimit";
+import ThemeToggle from "./ThemeToggle";
 
 function Layout({ onAddTransaction, showTransaction, setShowTransaction, editingTransaction, setEditingTransaction }) {
     const { logout } = useAuth();
@@ -26,6 +27,7 @@ function Layout({ onAddTransaction, showTransaction, setShowTransaction, editing
                 <nav onClick={() => setShowCategory(true)}>Add new category</nav>
                 <nav><Link to="/account">Account</Link></nav>
                 <nav onClick={() => setShowLimit(true)}>Set new limit</nav>
+                <ThemeToggle />
                 <button onClick={logout}>Logout</button>
                 <Outlet />
             </div>

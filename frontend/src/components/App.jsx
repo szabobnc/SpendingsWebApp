@@ -7,26 +7,29 @@ import ProtectedRoute from "./ProtectedRoute";
 import NewTransaction from "./NewTransaction";
 import NewCategory from "./NewCategory";
 import AccountPage from './AccountPage';
+import { ThemeProvider } from './ThemeProvider';
 
 const App = () => {
 
   return (
-<Router>
-      <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/newTransaction" element={<NewTransaction />} />
-          <Route path="/NewCategory" element={<NewCategory />} />
-          <Route element={<ProtectedRoute />}>
-            <Route path="/main" element={<Main />} />
-            <Route path="/account" element={<AccountPage />}/>
-          </Route>
-          
-        </Routes>
-      </AuthProvider>
-</Router>
+    <ThemeProvider defaultTheme="light" storageKey="expense-tracker-theme">
+      <Router>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/newTransaction" element={<NewTransaction />} />
+            <Route path="/NewCategory" element={<NewCategory />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/main" element={<Main />} />
+              <Route path="/account" element={<AccountPage />}/>
+            </Route>
+            
+          </Routes>
+        </AuthProvider>
+      </Router>
+    </ThemeProvider>
   )
 
 }
