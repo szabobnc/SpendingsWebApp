@@ -24,7 +24,7 @@ function TransactionPieChart({ data }) {
     const incomeData = [["Category", "Amount"], ...Object.entries(incomeTotals)];
 
     const incomeOption = {
-        title: "Income by category",
+        title: "Extrca income by category",
     };
     const expenseOption = {
         title: "Expense by category",
