@@ -6,6 +6,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./ProtectedRoute";
 import NewTransaction from "./NewTransaction";
 import NewCategory from "./NewCategory";
+import AccountPage from './AccountPage';
 import Transactions from "./Transactions";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -23,6 +24,7 @@ const App = () => {
             <Route path="/newTransaction" element={<NewTransaction />} />
             <Route path="/NewCategory" element={<NewCategory />} />
             <Route path="/main" element={<Main />} />
+            <Route path="/account" element={<AccountPage />}/>
             <Route path="/transactions" element={<Transactions />} />
           </Route>
 

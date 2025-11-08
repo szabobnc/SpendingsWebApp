@@ -12,6 +12,8 @@ function Register() {
     const [birthday, setBirthday] = useState("")
     const [password, setPassword] = useState("")
     const [repassword, setRePassword] = useState("")
+    const [isLoading, setIsLoading] = useState(false)
+    const [message, setMessage] = useState("")
 
     const navigate = useNavigate();
 
@@ -25,11 +27,14 @@ function Register() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
+        setMessage("");
+
         try {
             const response = await axios.post(`${apiUrl}api/register/`, {
                 username,
                 name,
-                birthday,
+                birthday: birthday || null, // Send null if empty
                 password,
                 repassword
             });
@@ -65,14 +70,17 @@ function Register() {
 
             }
         } catch (error) {
+            console.error("Registration error:", error);
             if (error.response) {
                 const msg = error.response.data?.message || 'Unknown server error!';
-                alert(`Error: ${msg}`);
+                setMessage(`Error: ${msg}`);
             } else if (error.request) {
-                alert('Server not responding!');
+                setMessage('Server not responding!');
             } else {
-                alert('Request error: ' + error.message);
+                setMessage('Request error: ' + error.message);
             }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -151,7 +159,6 @@ function Register() {
             </div>
         </>
     )
-
 }
 
 export default Register;

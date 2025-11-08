@@ -3,37 +3,49 @@ import { useAuth } from './context/AuthContext';
 import { useState } from "react";
 import NewTransaction from "./NewTransaction";
 import NewCategory from "./NewCategory"; 
+import SetLimit from "./SetLimit";
 
 function Layout({ onAddTransaction, showTransaction, setShowTransaction, editingTransaction, setEditingTransaction }) {
     const { logout } = useAuth();
     const [showCategory, setShowCategory] = useState(false);
+    const [showLimit, setShowLimit] = useState(false);
+
+    // Provide default functions if not passed as props
+    const handleSetEditingTransaction = setEditingTransaction || (() => {});
+    const handleSetShowTransaction = setShowTransaction || (() => {});
     const navigate = useNavigate();
 
     return (
         <>
             <div className="navbar">
-                <nav onClick={() => navigate("/main")}>Home</nav>
+                <nav><Link to="/main">Transactions</Link></nav>
                 <nav onClick={() => {
-                    setEditingTransaction(null);
-                    setShowTransaction(true);
+                    handleSetEditingTransaction(null);
+                    handleSetShowTransaction(true);
                 }}>Add new transaction</nav>
                 <nav><Link to="/main">Add new saving goal</Link></nav>
                 <nav onClick={() => setShowCategory(true)}>Add new category</nav>
+                <nav><Link to="/account">Account</Link></nav>
+                <nav onClick={() => setShowLimit(true)}>Set new limit</nav>
                 <button onClick={logout}>Logout</button>
                 <Outlet />
             </div>
 
-            {showTransaction && (
+            {showTransaction && onAddTransaction && (
                 <NewTransaction
-                    onClose={() => setShowTransaction(false)}
+                    onClose={() => handleSetShowTransaction(false)}
                     onAdd={onAddTransaction}
                     editingTransaction={editingTransaction}
-                    setEditingTransaction={setEditingTransaction}
+                    setEditingTransaction={handleSetEditingTransaction}
                 />
             )}
 
             {showCategory && (
                 <NewCategory onClose={() => setShowCategory(false)} />
+            )}
+
+            {showLimit && (
+                <SetLimit onClose={() => setShowLimit(false)} />
             )}
         </>
     );

@@ -117,6 +117,7 @@ function Main() {
                 <div>
                     <TransactionPieChart data={transactions} />
                     <table className="tx-table">
+                        <tbody>
                         <tr>
                             <th colSpan="2">Current month's balance</th>
                         </tr>
@@ -131,23 +132,27 @@ function Main() {
                         <tr className={posAmount-negAmount > 0 ? "pos-tx" : "neg-tx"}>
                             <td colSpan="2">{posAmount-negAmount}</td>
                         </tr>
+                        </tbody>
                     </table>
                     <table className="tx-table">
+                        <tbody>
                         <tr>
                             <th colSpan="5">Transactions</th>
                         </tr>
                         {transactions.map(tx => (
-                            <tr className={tx.is_income ? "pos-tx" : "neg-tx"}>
+                            <tr key={tx.id}
+                            className={tx.is_income ? "pos-tx" : "neg-tx"}>
                                 <td>{new Date(tx.date).toISOString().split("T")[0]}</td>
                                 <td>{tx.is_income ? tx.amount : '-' + tx.amount}</td>
                                 <td>{tx.category_name}</td>
                                 <td>{tx.description}</td>
                                 <td style={{width: '18%'}}>
                                     <button className="edit" onClick={() => handleEdit(tx)}><MdEdit /></button>
-                                    <button className="delete" onClick={() => handleDelete(tx.id)}><RiDeleteBin6Line onClick={() => handleDelete(tx.id)} /> </button>
+                                    <button className="delete" onClick={() => handleDelete(tx.id)}><RiDeleteBin6Line /> </button>
                                 </td>
                             </tr>
                         ))}
+                        </tbody>
                     </table>
                     
                     <button style={{ display: "block", margin: "0 auto" }} onClick={ e => navigate("/transactions")}>View all transaction</button>

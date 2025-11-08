@@ -56,9 +56,10 @@ MIDDLEWARE = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'api.authentication.CustomJWTAuthentication',
     )
 }
+
 
 from datetime import timedelta
 SIMPLE_JWT = {
@@ -102,7 +103,6 @@ DATABASES = {
         'PORT': '3306',
     }
 }
-
 
 
 # Password validation
