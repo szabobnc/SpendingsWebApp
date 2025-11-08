@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "./context/AuthContext";
 import SimpleLayout from "./SimpleLayout";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 
 // Assuming apiUrl is defined in your environment variables, or hardcode your base URL
 const apiUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/';
@@ -16,18 +17,22 @@ function AccountPage() {
     const [editingIncome, setEditingIncome] = useState(false);
     const [newIncome, setNewIncome] = useState('');
 
+    const navigate = useNavigate()
+    const location = useLocation();
+
+
     // --- Fetch Account Details on Load ---
     const fetchAccount = useCallback(async () => {
         setLoading(true);
         setError(null);
-        
+
         try {
             // Use consistent token key - 'access_token'
-            const token = localStorage.getItem('access_token'); 
+            const token = localStorage.getItem('access_token');
 
             if (!token) {
                 console.warn("No token found. Executing logout.");
-                logout(); 
+                logout();
                 return;
             }
 
@@ -36,19 +41,19 @@ function AccountPage() {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` 
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
             if (!response.ok) {
                 // This is the safety check for expired token
-                if (response.status === 401) { 
-                    logout(); 
+                if (response.status === 401) {
+                    logout();
                     throw new Error('Session expired. Please log in again.');
                 }
                 throw new Error(`Failed to fetch account: ${response.statusText}`);
             }
-            
+
             const data = await response.json();
             setAccount(data);
             setNewIncome(data.income || 0);
@@ -133,6 +138,12 @@ function AccountPage() {
             const token = localStorage.getItem('access_token');
             const newPremiumStatus = !account.is_premium;
 
+            if (newPremiumStatus) {
+                navigate("/payment");
+                setUpdating(false);
+                return;
+            }
+
             const res = await fetch(`${apiUrl}api/account/`, {
                 method: "PATCH",
                 headers: {
@@ -160,6 +171,47 @@ function AccountPage() {
         }
     };
 
+    const activatePremium = async () => {
+        setUpdating(true);
+        setError(null);
+        try {
+            console.log("activation started")
+            const token = localStorage.getItem('access_token');
+            const res = await fetch(`${apiUrl}api/account/`, {
+                method: "PATCH",
+                headers: {
+                    'Content-Type': "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ is_premium: true }),
+            });
+
+            if (!res.ok) {
+                if (res.status === 401) {
+                    logout();
+                    throw new Error('Session expired. Please log in again.');
+                }
+                throw new Error("Failed to update premium status");
+            }
+
+            const data = await res.json();
+            console.log(data)
+            setAccount(data);
+        } catch (err) {
+            console.error(err);
+            setError(err.message);
+        } finally {
+            setUpdating(false)
+        }
+    }
+
+    useEffect(() => {
+        console.log("state:", location.state)
+        if (location.state?.paymentSuccess) {
+            activatePremium();
+        }
+    }, [location.state]);
+
     // Calculate balance components
     const monthlyIncome = account?.income || 0;
     const extraIncome = transactions
@@ -183,16 +235,16 @@ function AccountPage() {
                 <div className="account-card">
                     <p><strong>Username:</strong> {account.username}</p>
                     <p><strong>Name:</strong> {account.name}</p>
-                    
+
                     <p>
-                        <strong>Monthly Income:</strong> 
+                        <strong>Monthly Income:</strong>
                         {editingIncome ? (
-                            <span style={{marginLeft: '10px'}}>
-                                <input 
-                                    type="number" 
-                                    value={newIncome} 
+                            <span style={{ marginLeft: '10px' }}>
+                                <input
+                                    type="number"
+                                    value={newIncome}
                                     onChange={(e) => setNewIncome(e.target.value)}
-                                    style={{width: '100px', marginRight: '10px'}}
+                                    style={{ width: '100px', marginRight: '10px' }}
                                 />
                                 <button onClick={updateIncome} disabled={updating}>
                                     {updating ? 'Saving...' : 'Save'}
@@ -200,16 +252,16 @@ function AccountPage() {
                                 <button onClick={() => {
                                     setEditingIncome(false);
                                     setNewIncome(account.income || 0);
-                                }} style={{marginLeft: '5px'}}>
+                                }} style={{ marginLeft: '5px' }}>
                                     Cancel
                                 </button>
                             </span>
                         ) : (
                             <span>
-                                <span className="pos-tx" style={{marginLeft: '10px'}}>{monthlyIncome.toFixed(2)} Ft</span>
-                                <button 
+                                <span className="pos-tx" style={{ marginLeft: '10px' }}>{monthlyIncome.toFixed(2)} Ft</span>
+                                <button
                                     onClick={() => setEditingIncome(true)}
-                                    style={{marginLeft: '10px', fontSize: '12px', padding: '2px 8px'}}
+                                    style={{ marginLeft: '10px', fontSize: '12px', padding: '2px 8px' }}
                                 >
                                     Edit
                                 </button>
@@ -228,16 +280,16 @@ function AccountPage() {
                     <p><strong>Birthday:</strong> {account.birthday || 'Not set'}</p>
                     <p>
                         <strong>Premium:</strong> {account.is_premium ? "Yes" : "No"}
-                        <button 
-                            onClick={togglePremium} 
+                        <button
+                            onClick={togglePremium}
                             disabled={updating}
-                            style={{marginLeft: '15px', background: account.is_premium ? '#dc2626' : '#10b981'}}
+                            style={{ marginLeft: '15px', background: account.is_premium ? '#dc2626' : '#10b981' }}
                         >
                             {updating
                                 ? "Updating..."
                                 : account.is_premium
-                                ? "Revoke Premium"
-                                : "Upgrade to Premium"}
+                                    ? "Revoke Premium"
+                                    : "Upgrade to Premium"}
                         </button>
                     </p>
                 </div>

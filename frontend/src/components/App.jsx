@@ -11,6 +11,7 @@ import Transactions from "./Transactions";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider } from './ThemeProvider';
+import PaymentPage from "./PaymentPage";
 
 const App = () => {
 
@@ -26,12 +27,14 @@ const App = () => {
             <Route path="/NewCategory" element={<NewCategory />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/newTransaction" element={<NewTransaction />} />
-            <Route path="/NewCategory" element={<NewCategory />} />
-            <Route path="/main" element={<Main />} />
-            <Route path="/account" element={<AccountPage />}/>
-            <Route path="/transactions" element={<Transactions />} />
+              <Route path="/NewCategory" element={<NewCategory />} />
+              <Route path="/main" element={<Main />} />
+              <Route path="/account" element={<AccountPage />} />
+              <Route path="/transactions" element={<Transactions />} />
+              <Route path="/payment" element={<PaymentPage />} />
+
             </Route>
-            
+
           </Routes>
         </AuthProvider>
       </Router>
