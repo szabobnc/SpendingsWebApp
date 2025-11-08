@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "./context/AuthContext";
 import SimpleLayout from "./SimpleLayout";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 
 // Assuming apiUrl is defined in your environment variables, or hardcode your base URL
 const apiUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/';
@@ -175,7 +176,6 @@ function AccountPage() {
         setUpdating(true);
         setError(null);
         try {
-            console.log("activation started")
             const token = localStorage.getItem('access_token');
             const res = await fetch(`${apiUrl}api/account/`, {
                 method: "PATCH",
@@ -195,7 +195,6 @@ function AccountPage() {
             }
 
             const data = await res.json();
-            console.log(data)
             setAccount(data);
         } catch (err) {
             console.error(err);
@@ -203,6 +202,17 @@ function AccountPage() {
         } finally {
             setUpdating(false)
         }
+        console.log("succes")
+        toast.success("The payment was successful! Your account is now premium!", {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored"
+        });
     }
 
     useEffect(() => {
@@ -228,73 +238,76 @@ function AccountPage() {
     if (!account) return <SimpleLayout><p>No account data available.</p></SimpleLayout>;
 
     return (
-        <SimpleLayout>
-            <div className="account-page">
-                <h1>Account Details</h1>
+        <>
+            <ToastContainer />
+            <SimpleLayout>
+                <div className="account-page">
+                    <h1>Account Details</h1>
 
-                <div className="account-card">
-                    <p><strong>Username:</strong> {account.username}</p>
-                    <p><strong>Name:</strong> {account.name}</p>
+                    <div className="account-card">
+                        <p><strong>Username:</strong> {account.username}</p>
+                        <p><strong>Name:</strong> {account.name}</p>
 
-                    <p>
-                        <strong>Monthly Income:</strong>
-                        {editingIncome ? (
-                            <span style={{ marginLeft: '10px' }}>
-                                <input
-                                    type="number"
-                                    value={newIncome}
-                                    onChange={(e) => setNewIncome(e.target.value)}
-                                    style={{ width: '100px', marginRight: '10px' }}
-                                />
-                                <button onClick={updateIncome} disabled={updating}>
-                                    {updating ? 'Saving...' : 'Save'}
-                                </button>
-                                <button onClick={() => {
-                                    setEditingIncome(false);
-                                    setNewIncome(account.income || 0);
-                                }} style={{ marginLeft: '5px' }}>
-                                    Cancel
-                                </button>
-                            </span>
-                        ) : (
-                            <span>
-                                <span className="pos-tx" style={{ marginLeft: '10px' }}>{monthlyIncome.toFixed(2)} Ft</span>
-                                <button
-                                    onClick={() => setEditingIncome(true)}
-                                    style={{ marginLeft: '10px', fontSize: '12px', padding: '2px 8px' }}
-                                >
-                                    Edit
-                                </button>
-                            </span>
+                        <p>
+                            <strong>Monthly Income:</strong>
+                            {editingIncome ? (
+                                <span style={{ marginLeft: '10px' }}>
+                                    <input
+                                        type="number"
+                                        value={newIncome}
+                                        onChange={(e) => setNewIncome(e.target.value)}
+                                        style={{ width: '100px', marginRight: '10px' }}
+                                    />
+                                    <button onClick={updateIncome} disabled={updating}>
+                                        {updating ? 'Saving...' : 'Save'}
+                                    </button>
+                                    <button onClick={() => {
+                                        setEditingIncome(false);
+                                        setNewIncome(account.income || 0);
+                                    }} style={{ marginLeft: '5px' }}>
+                                        Cancel
+                                    </button>
+                                </span>
+                            ) : (
+                                <span>
+                                    <span className="pos-tx" style={{ marginLeft: '10px' }}>{monthlyIncome.toFixed(2)} Ft</span>
+                                    <button
+                                        onClick={() => setEditingIncome(true)}
+                                        style={{ marginLeft: '10px', fontSize: '12px', padding: '2px 8px' }}
+                                    >
+                                        Edit
+                                    </button>
+                                </span>
+                            )}
+                        </p>
+
+                        {extraIncome > 0 && (
+                            <p><strong>Extra Income (This Month):</strong> <span className="pos-tx">{extraIncome.toFixed(2)} Ft</span></p>
                         )}
-                    </p>
-
-                    {extraIncome > 0 && (
-                        <p><strong>Extra Income (This Month):</strong> <span className="pos-tx">{extraIncome.toFixed(2)} Ft</span></p>
-                    )}
-                    <p><strong>Total Income:</strong> <span className="pos-tx">{totalIncome.toFixed(2)} Ft</span></p>
-                    <p><strong>Total Expenses:</strong> <span className="neg-tx">{expenses.toFixed(2)} Ft</span></p>
-                    <p><strong>Balance:</strong> <span className={balance >= 0 ? "pos-tx" : "neg-tx"}>
-                        {loadingTransactions ? 'Calculating...' : balance.toFixed(2)} Ft
-                    </span></p>
-                    <p><strong>Birthday:</strong> {account.birthday || 'Not set'}</p>
-                    <p>
-                        <strong>Premium:</strong> {account.is_premium ? "Yes" : "No"}
-                        <button
-                            onClick={togglePremium}
-                            disabled={updating}
-                            style={{ marginLeft: '15px', background: account.is_premium ? '#dc2626' : '#10b981' }}
-                        >
-                            {updating
-                                ? "Updating..."
-                                : account.is_premium
-                                    ? "Revoke Premium"
-                                    : "Upgrade to Premium"}
-                        </button>
-                    </p>
+                        <p><strong>Total Income:</strong> <span className="pos-tx">{totalIncome.toFixed(2)} Ft</span></p>
+                        <p><strong>Total Expenses:</strong> <span className="neg-tx">{expenses.toFixed(2)} Ft</span></p>
+                        <p><strong>Balance:</strong> <span className={balance >= 0 ? "pos-tx" : "neg-tx"}>
+                            {loadingTransactions ? 'Calculating...' : balance.toFixed(2)} Ft
+                        </span></p>
+                        <p><strong>Birthday:</strong> {account.birthday || 'Not set'}</p>
+                        <p>
+                            <strong>Premium:</strong> {account.is_premium ? "Yes" : "No"}
+                            <button
+                                onClick={togglePremium}
+                                disabled={updating}
+                                style={{ marginLeft: '15px', background: account.is_premium ? '#dc2626' : '#10b981' }}
+                            >
+                                {updating
+                                    ? "Updating..."
+                                    : account.is_premium
+                                        ? "Revoke Premium"
+                                        : "Upgrade to Premium"}
+                            </button>
+                        </p>
+                    </div>
                 </div>
-            </div>
-        </SimpleLayout>
+            </SimpleLayout>
+        </>
     );
 }
 
