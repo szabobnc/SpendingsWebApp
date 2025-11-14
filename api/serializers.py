@@ -1,6 +1,6 @@
 # serializers.py
 from rest_framework import serializers
-from .models import Transaction, Person, Token, Category, CategoryLimit
+from .models import Transaction, Person, Token, Category, CategoryLimit, SavingsGoal
 from django.contrib.auth.hashers import make_password 
 
 class TokenSerializer(serializers.ModelSerializer):
@@ -15,24 +15,6 @@ class TransactionSerializer(serializers.ModelSerializer):
         model = Transaction
         fields = ['id', 'user', 'category', 'category_name', 'amount', 'date', 'description', 'is_income']
         read_only_fields = ['id', 'user', 'date']
-
-
-'''class RegisterSerializer(serializers.ModelSerializer):
-    repassword = serializers.CharField(write_only=True)
-
-    class Meta:
-        model = Person
-        fields = ['username', 'name', 'income', 'birthday', 'password', 'repassword']
-
-    def validate(self, data):
-        if data['password'] != data['repassword']:
-            raise serializers.ValidationError("Passwords do not match!")
-        return data
-
-    def create(self, validated_data):
-        validated_data.pop('repassword')
-        validated_data['password'] = make_password(validated_data['password'])
-        return super().create(validated_data)'''
 
 class RegisterSerializer(serializers.ModelSerializer):
     repassword = serializers.CharField(write_only=True)
@@ -66,7 +48,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             
         return super().create(validated_data)
 
-
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -84,6 +65,30 @@ class CategoryLimitSerializer(serializers.ModelSerializer):
     class Meta:
         model = CategoryLimit
         fields = ['id', 'user', 'category', 'category_name', 'limit_amount', 'created_at', 'updated_at']
-        # --- CHANGE HERE ---
-        # Add 'user' to read_only_fields
         read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+
+class SavingsGoalSerializer(serializers.ModelSerializer):
+    progress_percentage = serializers.ReadOnlyField()
+    months_remaining = serializers.ReadOnlyField()
+    is_on_track = serializers.ReadOnlyField()
+    
+    class Meta:
+        model = SavingsGoal
+        fields = [
+            'id', 'user', 'name', 'target_amount', 'current_amount', 
+            'monthly_contribution', 'deadline', 'status', 'created_at', 
+            'updated_at', 'last_contribution_date', 'progress_percentage', 
+            'months_remaining', 'is_on_track', 'category'
+        ]
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at', 'last_contribution_date', 'category']
+
+    def validate(self, data):
+        # Validate target amount
+        if data.get('target_amount', 0) <= 0:
+            raise serializers.ValidationError("Target amount must be greater than 0")
+        
+        # Validate monthly contribution
+        if data.get('monthly_contribution', 0) <= 0:
+            raise serializers.ValidationError("Monthly contribution must be greater than 0")
+        
+        return data

@@ -7,7 +7,11 @@ from .views import (
     account_view,
     category_limit_list,
     category_limit_detail,
-    check_category_spending
+    check_category_spending,
+    savings_goal_list,
+    savings_goal_detail,
+    process_monthly_contributions,
+    force_monthly_contributions
 )
 from rest_framework_simplejwt.views import TokenRefreshView
 from . import views
@@ -28,4 +32,10 @@ urlpatterns = [
     path('category-limits/', category_limit_list, name='category-limit-list'),
     path('category-limits/<int:pk>/', category_limit_detail, name='category-limit-detail'),
     path('category-spending/<int:category_id>/', check_category_spending, name='check-category-spending'),
+    
+    # Savings Goal endpoints
+    path('savings-goals/', savings_goal_list, name='savings-goal-list'),
+    path('savings-goals/<int:pk>/', savings_goal_detail, name='savings-goal-detail'),
+    path('savings-goals/process-contributions/', process_monthly_contributions, name='process-monthly-contributions'),
+    path('savings-goals/force-contributions/', force_monthly_contributions, name='force-monthly-contributions'),
 ]

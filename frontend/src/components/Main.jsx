@@ -17,11 +17,12 @@ function Main() {
     const [loadingTransactions, setLoadingTransactions] = useState(true);
     const [account, setAccount] = useState(null);
     const [loadingAccount, setLoadingAccount] = useState(true);
+    const [savingsGoals, setSavingsGoals] = useState([]);
+    const [allSavingsGoalNames, setAllSavingsGoalNames] = useState([]);
+    const [loadingSavingsGoals, setLoadingSavingsGoals] = useState(true);
 
     const [extraIncome, setExtraIncome] = useState(0);
     const [negAmount, setNegAmount] = useState(0);
-
-    const current = new Date();
 
     // Lifted state
     const [showTransaction, setShowTransaction] = useState(false);
@@ -90,9 +91,11 @@ function Main() {
         if (!user) return;
         const fetchTransactions = async () => {
             try {
+                const current = new Date();
                 const res = await fetch(`${apiUrl}api/transactions/?user_id=${user.id}&date=${current.getMonth()}`);
                 if (!res.ok) throw new Error("Failed to fetch transactions");
                 const data = await res.json();
+                console.log('Fetched transactions:', data); // Debug: check if savings_goal is in the response
                 setTransactions(data);
             } catch (err) {
                 console.error(err);
@@ -102,6 +105,49 @@ function Main() {
         };
         fetchTransactions();
     }, [user]);
+
+    // Fetch savings goals for premium users
+    useEffect(() => {
+        if (!user || !account) return;
+        
+        const fetchSavingsGoals = async () => {
+            if (!account.is_premium) {
+                setLoadingSavingsGoals(false);
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('access_token');
+                const response = await fetch(`${apiUrl}api/savings-goals/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // Store all goals (not just active) to check transaction categories
+                    setSavingsGoals(data.filter(goal => goal.status === 'active'));
+                    // Also store all goal names for transaction checking (including completed/paused)
+                    setAllSavingsGoalNames(data.map(goal => goal.name));
+                }
+            } catch (err) {
+                console.error('Error fetching savings goals:', err);
+            } finally {
+                setLoadingSavingsGoals(false);
+            }
+        };
+        fetchSavingsGoals();
+    }, [user, account]);
+
+    // Helper function to check if transaction is from a savings goal
+    const isSavingsGoalTransaction = (tx) => {
+        if (!tx.category_name) return false;
+        // Check against all savings goal names (including completed/paused)
+        return allSavingsGoalNames.includes(tx.category_name);
+    };
 
     // Calculate extra income and expenses from transactions
     useEffect(() => {
@@ -113,6 +159,9 @@ function Main() {
     const monthlyIncome = account?.income || 0;
     const totalIncome = monthlyIncome + extraIncome;
     const balance = totalIncome - negAmount;
+
+    // Calculate total savings goal contributions
+    const totalSavingsContributions = savingsGoals.reduce((sum, goal) => sum + goal.monthly_contribution, 0);
 
     return (
         <div>
@@ -199,6 +248,126 @@ function Main() {
                         </tbody>
                     </table>
 
+                    {/* Savings Goals Summary for Premium Users */}
+                    {account?.is_premium && !loadingSavingsGoals && (
+                        <table className="tx-table" style={{marginTop: '10px'}}>
+                            <tbody>
+                            <tr>
+                                <th colSpan="2">
+                                    Savings Goals Summary
+                                    <button 
+                                        onClick={() => navigate('/savings-goals')}
+                                        style={{ 
+                                            marginLeft: '10px', 
+                                            fontSize: '12px', 
+                                            padding: '4px 8px',
+                                            background: '#10b981'
+                                        }}
+                                    >
+                                        Manage Goals
+                                    </button>
+                                </th>
+                            </tr>
+                            {savingsGoals.length > 0 ? (
+                                <>
+                                    {savingsGoals.map(goal => (
+                                        <tr key={goal.id}>
+                                            <td>{goal.name}</td>
+                                            <td>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                    <div style={{ flex: 1 }}>
+                                                        <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                                                            {goal.current_amount.toFixed(0)} / {goal.target_amount.toFixed(0)} Ft
+                                                        </div>
+                                                        <div style={{ 
+                                                            width: '100%', 
+                                                            height: '8px', 
+                                                            backgroundColor: '#e5e7eb', 
+                                                            borderRadius: '4px',
+                                                            overflow: 'hidden'
+                                                        }}>
+                                                            <div style={{
+                                                                width: `${goal.progress_percentage}%`,
+                                                                height: '100%',
+                                                                backgroundColor: goal.is_on_track ? '#10b981' : '#f59e0b',
+                                                                transition: 'width 0.3s ease'
+                                                            }}></div>
+                                                        </div>
+                                                    </div>
+                                                    <div style={{ 
+                                                        fontSize: '12px', 
+                                                        color: goal.is_on_track ? '#10b981' : '#f59e0b',
+                                                        fontWeight: 'bold'
+                                                    }}>
+                                                        {goal.progress_percentage.toFixed(1)}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    <tr style={{fontWeight: 'bold', backgroundColor: '#f9fafb'}}>
+                                        <td>Total Monthly Contributions</td>
+                                        <td className="neg-tx">{totalSavingsContributions}</td>
+                                    </tr>
+                                    <tr style={{fontWeight: 'bold'}}>
+                                        <td>Available after Savings</td>
+                                        <td className={balance - totalSavingsContributions > 0 ? "pos-tx" : "neg-tx"}>
+                                            {balance - totalSavingsContributions}
+                                        </td>
+                                    </tr>
+                                </>
+                            ) : (
+                                <tr>
+                                    <td colSpan="2" style={{ textAlign: 'center', color: '#6b7280', fontStyle: 'italic' }}>
+                                        No active savings goals. 
+                                        <button 
+                                            onClick={() => navigate('/savings-goals/new')}
+                                            style={{ 
+                                                marginLeft: '5px', 
+                                                fontSize: '12px', 
+                                                padding: '2px 6px',
+                                                background: '#10b981'
+                                            }}
+                                        >
+                                            Create one
+                                        </button>
+                                    </td>
+                                </tr>
+                            )}
+                            </tbody>
+                        </table>
+                    )}
+
+                    {/* Upgrade to Premium CTA for non-premium users */}
+                    {account && !account.is_premium && (
+                        <table className="tx-table" style={{marginTop: '10px'}}>
+                            <tbody>
+                            <tr>
+                                <th colSpan="2" style={{ backgroundColor: '#fef3c7', color: '#92400e' }}>
+                                    Premium Feature: Savings Goals
+                                </th>
+                            </tr>
+                            <tr>
+                                <td colSpan="2" style={{ textAlign: 'center', padding: '15px' }}>
+                                    <div style={{ marginBottom: '10px', color: '#6b7280' }}>
+                                        Set up to 3 automatic savings goals with smart balance management
+                                    </div>
+                                    <button 
+                                        onClick={() => navigate('/account')}
+                                        style={{ 
+                                            background: '#f59e0b',
+                                            color: 'white',
+                                            padding: '8px 16px'
+                                        }}
+                                    >
+                                        Upgrade to Premium
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    )}
+
                     {transactions.length === 0 ? (
                         <p>No transactions yet.</p>
                     ) : (
@@ -215,8 +384,12 @@ function Main() {
                                     <td>{tx.category_name}</td>
                                     <td>{tx.description}</td>
                                     <td style={{width: '18%'}}>
-                                        <button className="edit" onClick={() => handleEdit(tx)}><MdEdit /></button>
-                                        <button className="delete" onClick={() => handleDelete(tx.id)}><RiDeleteBin6Line /> </button>
+                                        {!isSavingsGoalTransaction(tx) ? (
+                                            <>
+                                                <button className="edit" onClick={() => handleEdit(tx)}><MdEdit /></button>
+                                                <button className="delete" onClick={() => handleDelete(tx.id)}><RiDeleteBin6Line /> </button>
+                                            </>
+                                        ) : null}
                                     </td>
                                 </tr>
                             ))}

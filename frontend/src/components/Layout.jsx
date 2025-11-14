@@ -7,7 +7,7 @@ import SetLimit from "./SetLimit";
 import ThemeToggle from "./ThemeToggle";
 
 function Layout({ onAddTransaction, showTransaction, setShowTransaction, editingTransaction, setEditingTransaction }) {
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
     const [showCategory, setShowCategory] = useState(false);
     const [showLimit, setShowLimit] = useState(false);
 
@@ -19,16 +19,16 @@ function Layout({ onAddTransaction, showTransaction, setShowTransaction, editing
     return (
         <>
             <div className="navbar">
+                <ThemeToggle />
                 <nav><Link to="/main">Transactions</Link></nav>
                 <nav onClick={() => {
                     handleSetEditingTransaction(null);
                     handleSetShowTransaction(true);
-                }}>Add new transaction</nav>
-                <nav><Link to="/main">Add new saving goal</Link></nav>
-                <nav onClick={() => setShowCategory(true)}>Add new category</nav>
+                }}>Add Transaction</nav>
+                <nav onClick={() => setShowCategory(true)}>Add Category</nav>
+                <nav onClick={() => setShowLimit(true)}>Add Limit</nav>
+                <nav><Link to="/savings-goals">Savings Goals</Link></nav>
                 <nav><Link to="/account">Account</Link></nav>
-                <nav onClick={() => setShowLimit(true)}>Set new limit</nav>
-                <ThemeToggle />
                 <button onClick={logout}>Logout</button>
                 <Outlet />
             </div>

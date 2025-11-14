@@ -8,6 +8,8 @@ import NewTransaction from "./NewTransaction";
 import NewCategory from "./NewCategory";
 import AccountPage from './AccountPage';
 import Transactions from "./Transactions";
+import SavingGoals from "./SavingGoals";
+import NewSavingGoal from "./NewSavingGoal";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider } from './ThemeProvider';
@@ -32,7 +34,9 @@ const App = () => {
               <Route path="/account" element={<AccountPage />} />
               <Route path="/transactions" element={<Transactions />} />
               <Route path="/payment" element={<PaymentPage />} />
-
+              <Route path="/savings-goals" element={<SavingGoals />} />
+              <Route path="/savings-goals/new" element={<NewSavingGoal />} />
+              <Route path="/savings-goals/edit/:id" element={<NewSavingGoal />} />
             </Route>
 
           </Routes>
