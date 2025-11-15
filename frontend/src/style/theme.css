@@ -1,6 +1,6 @@
-/* Theme Variables */
+/* Theme Variables 
 :root {
-  /* Light Theme Colors */
+  /* Light Theme Colors 
   --bg-primary: #ffffff;
   --bg-secondary: #f8fafc;
   --bg-tertiary: #f1f5f9;
@@ -12,7 +12,7 @@
   --shadow: rgba(0, 0, 0, 0.1);
   --shadow-lg: rgba(0, 0, 0, 0.15);
   
-  /* Button Colors */
+  /* Button Colors 
   --btn-primary-bg: #3b82f6;
   --btn-primary-hover: #2563eb;
   --btn-primary-text: #ffffff;
@@ -26,26 +26,80 @@
   --btn-success-hover: #059669;
   --btn-success-text: #ffffff;
   
-  /* Form Elements */
+  /* Form Elements 
   --input-bg: #ffffff;
   --input-border: #d1d5db;
   --input-focus: #3b82f6;
   --select-bg: #ffffff;
-  
-  /* Status Colors */
+
+  /* Status Colors 
   --positive-color: #10b981;
   --negative-color: #ef4444;
   --warning-color: #f59e0b;
   --warning-bg: #fef3c7;
   --error-bg: #fee2e2;
   
-  /* Modal/Overlay */
+  /* Modal/Overlay 
   --overlay-bg: rgba(0, 0, 0, 0.5);
   --modal-bg: #ffffff;
   --modal-border: #e5e7eb;
-}
+}*/
+:root {
+  --bg-primary: #fdfeff;
+  --bg-secondary: #f2f6ff;
+  --bg-tertiary: #e6eeff;
 
-/* Dark Theme Colors */
+  --text-primary: #0d1b2a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+
+  --border-color: #000000;
+  --border-hover: #b9c8e4;
+  --shadow: rgba(0, 0, 0, 0.08);
+  --shadow-lg: rgba(0, 0, 0, 0.12);
+
+  /* Buttons */
+  --btn-primary-bg: #3b82f6;
+  --btn-primary-hover: #2563eb;
+  --btn-primary-text: #ffffff;
+
+  --btn-secondary-bg: #eef4ff;
+  --btn-secondary-hover: #dae7ff;
+  --btn-secondary-text: #0d0001;
+
+  --btn-danger-bg: #ef4444;
+  --btn-danger-hover: #dc2626;
+  --btn-danger-text: #ffffff;
+
+  --btn-success-bg: #10b981;
+  --btn-success-hover: #059669;
+  --btn-success-text: #ffffff;
+
+  /* Inputs */
+  --input-bg: #ffffff;
+  --input-border: #c9d8f2;
+  --input-focus: #3b82f6;
+
+  --select-bg: #ffffff;
+
+  /* Status colors */
+  --positive-color: #10b981;
+  --negative-color: #ef4444;
+
+  /* Warning/Error BG */
+  --warning-bg: #fff4d6;
+  --error-bg: #ffe5e5;
+
+  /* Modal/Overlay */
+  --overlay-bg: rgba(0, 0, 0, 0.5);
+  --modal-bg: #ffffff;
+  --modal-border: #dbe4f3;
+}
+/* Dark theme override */
+[data-theme="dark"] h1 {
+    color: #6363a7;       /* lighter blue for dark mode */
+}
+/* Dark Theme Colors
 [data-theme="dark"] {
   --bg-primary: #0f172a;
   --bg-secondary: #1e293b;
@@ -58,7 +112,7 @@
   --shadow: rgba(0, 0, 0, 0.3);
   --shadow-lg: rgba(0, 0, 0, 0.4);
   
-  /* Button Colors */
+   Button Colors 
   --btn-primary-bg: #3b82f6;
   --btn-primary-hover: #2563eb;
   --btn-primary-text: #ffffff;
@@ -72,23 +126,79 @@
   --btn-success-hover: #059669;
   --btn-success-text: #ffffff;
   
-  /* Form Elements */
+  Form Elements
   --input-bg: #1f2937;
   --input-border: #4b5563;
   --input-focus: #3b82f6;
   --select-bg: #1f2937;
   
-  /* Status Colors */
+   Status Colors 
   --positive-color: #34d399;
   --negative-color: #f87171;
   --warning-color: #fbbf24;
   --warning-bg: #451a03;
   --error-bg: #450a0a;
   
-  /* Modal/Overlay */
+  /* Modal/Overlay 
   --overlay-bg: rgba(0, 0, 0, 0.7);
   --modal-bg: #1e293b;
   --modal-border: #475569;
+}
+
+*/  
+[data-theme="dark"] {
+  /* Backgrounds */
+  --bg-primary: #0b0e0b !important;
+  --bg-secondary: #6363a7;
+  --bg-tertiary: #7f6ba9;
+
+  /* Text */
+  --text-primary: #e8e4ff;
+  --text-secondary: #b9aedd;
+  --text-muted: #8a7fb1;
+  --text-hover:var(--bg-primary)
+
+  /* Borders & Shadow */
+  --border-color: #2d2540;
+  --border-hover: #8b5cf6;
+  --shadow: rgba(255, 255, 255, 0.5);
+  --shadow-lg: rgba(0, 0, 0, 0.65);
+
+  /* Buttons */
+  --btn-primary-bg: #8b5cf6;
+  --btn-primary-hover: #7c3aed;
+  --btn-primary-text: #ffffff;
+
+  --btn-secondary-bg: #6c59ae;
+  --btn-secondary-hover: #9270ce;
+  --btn-secondary-text: #d6ccf5;
+
+  --btn-danger-bg: #f43f5e;
+  --btn-danger-hover: #e11d48;
+  --btn-danger-text: #ffffff;
+
+  --btn-success-bg: #22c55e;
+  --btn-success-hover: #16a34a;
+  --btn-success-text: #ffffff;
+
+  /* Forms */
+  --input-bg: #15151c;
+  --input-border: #3f3353;
+  --input-focus: #a78bfa;
+  --select-bg: #15151c;
+
+  /* Status */
+  --positive-color: #22d3ee;
+  --negative-color: #f87171;
+
+  /* Background alerts */
+  --warning-bg: #3a1f00;
+  --error-bg: #3f0a17;
+
+  /* Overlay/Modal */
+  --overlay-bg: rgba(10, 0, 20, 0.7);
+  --modal-bg: #1a1623;
+  --modal-border: #2d2540;
 }
 
 /* Base Styles */
@@ -116,7 +226,10 @@ body {
   flex-wrap: wrap;
   box-shadow: 0 1px 3px var(--shadow);
   transition: all 0.3s ease;
+  backdrop-filter: blur(6px);
+
 }
+
 
 .navbar nav {
   cursor: pointer;
@@ -154,11 +267,50 @@ button {
   background-color: var(--btn-primary-bg);
   color: var(--btn-primary-text);
 }
-
+/*
 button:hover {
   background-color: var(--btn-primary-hover);
   transform: translateY(-1px);
   box-shadow: 0 4px 6px var(--shadow);
+}*/
+
+[data-theme="dark"] button:hover {
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.6);
+}
+[data-theme="dark"] .navbar {
+  background: linear-gradient(90deg, #0b0b0e, #1f1a29);
+}
+
+
+[data-theme="dark"] .search-bar input,.search-bar select {
+    background-color: #080808 !important;
+}
+
+[data-theme="dark"] .search-bar input:focus,.search-bar select:focus {
+    border-color: #ec19ec !important;
+}
+.search-bar input,
+.search-bar select {
+    padding: 0.6rem 1rem;
+    border: 1px solid #cce7ff;
+    border-radius: 8px;
+    background-color: #ffffff;
+    min-width: 150px;
+    flex: 1;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease;
+}
+
+.search-bar input:focus,
+.search-bar select:focus {
+    border-color: #0077cc;
+    outline: none;
+}
+
+[data-theme="dark"] label {
+  color: #481243;
+  font-weight: 500;
+  font-size: 0.875rem;
 }
 
 button:disabled {
@@ -336,14 +488,19 @@ fieldset {
   background-color: var(--bg-tertiary);
 }
 
+[data-theme="dark"].tx-table tbody tr:hover {
+  background-color: #410831;
+}
+
 .tx-table tbody tr:last-child td {
   border-bottom: none;
 }
 
 /* Status Classes */
 .pos-tx {
-  color: var(--positive-color);
   font-weight: 600;
+  background-color: #009463 !important;
+  color: whitesmoke;
 }
 
 .neg-tx {

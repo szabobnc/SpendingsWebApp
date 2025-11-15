@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 function TransactionPieChart({ data }) {
     console.log(data);
     const [isDark, setIsDark] = useState(false);
-
+    
     // Detect theme changes
     useEffect(() => {
         const checkTheme = () => {
@@ -44,6 +44,28 @@ function TransactionPieChart({ data }) {
 
     const incomeData = [["Category", "Amount"], ...Object.entries(incomeTotals)];
 
+    // Theme-aware chart colors
+const chartColors = isDark
+    ? [
+        "#8b5cf6", // purple
+        "#a78bfa", // light purple
+        "#22d3ee", // cyan
+        "#f87171", // soft red
+        "#fb923c", // orange
+        "#c084fc",
+        "#34d399"
+      ]
+    : [
+        "#3b82f6", // blue
+        "#2563eb", // darker blue
+        "#16a34a", // green
+        "#dc2626", // red
+        "#f59e0b", // amber
+        "#60a5fa",
+        "#10b981"
+      ];
+
+
     // Chart options that adapt to theme
     const getChartOptions = (title) => ({
         title: title,
@@ -70,7 +92,10 @@ function TransactionPieChart({ data }) {
             textStyle: {
                 color: isDark ? '#0f172a' : '#0f172a'
             }
-        }
+        },
+
+        // 👇 Add this
+        colors: chartColors
     });
 
     const incomeOption = getChartOptions("Extra income by category");

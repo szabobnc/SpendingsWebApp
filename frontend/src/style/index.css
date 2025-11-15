@@ -179,7 +179,14 @@ button.edit {
     margin: 0 5px 0 5px;
     background-color: #3d8ff5;
 }
-
+/* Dark theme override */
+[data-theme="dark"] .charts {
+    background-color: #63637a;
+}
+/* Dark theme override */
+[data-theme="dark"] .charts > div {
+    background-color: #a2a2d2;
+}
 .charts {
     display: flex;
     flex-wrap: wrap;
@@ -252,9 +259,17 @@ tr:hover {
     transition: background-color 0.2s ease;
 }
 
-.pos-tx {
-    background-color: #e6f7ea !important;
+[data-theme="dark"] .pos-tx {
+    background-color: #3f2e65 !important;
+    color: whitesmoke !important;
 }
+
+[data-theme="dark"] .neg-tx {
+  color: #cb46c7 !important;
+  font-weight: 600;
+  color: rgba(91, 164, 255, 0.2);
+}
+
 
 .neg-tx {
     background-color: #fdeaea !important;
@@ -277,23 +292,7 @@ tr:hover {
     gap: 1rem;
 }
 
-.search-bar input,
-.search-bar select {
-    padding: 0.6rem 1rem;
-    border: 1px solid #cce7ff;
-    border-radius: 8px;
-    background-color: #ffffff;
-    min-width: 150px;
-    flex: 1;
-    font-size: 0.95rem;
-    transition: border-color 0.2s ease;
-}
 
-.search-bar input:focus,
-.search-bar select:focus {
-    border-color: #0077cc;
-    outline: none;
-}
 
 @media (max-width: 500px) {
     .modal {
