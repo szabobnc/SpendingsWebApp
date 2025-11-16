@@ -24,7 +24,7 @@ function NewTransaction({ onClose, onAdd, editingTransaction, setEditingTransact
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await axios.get(`${apiUrl}api/getCategories/`);
+                const res = await axios.get(`${apiUrl}api/getCategories/?user_id=${user.id}`);
                 setCategories(res.data);
             } catch (err) {
                 console.error(err);

@@ -27,6 +27,8 @@ urlpatterns = [
     path('createCategory/', views.createCategory, name='createCategory'),
     path('transactions/<int:pk>/', views.transaction_detail, name='transaction-detail'),
     path('account/', account_view, name='account'),
+    path('history/', views.transaction_history, name='transaction-list'),
+
     
     # Category Limit endpoints
     path('category-limits/', category_limit_list, name='category-limit-list'),

@@ -4,10 +4,11 @@ import { toast } from "react-toastify";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
-function NewCategory({ onClose }) {
+function NewCategory({ onClose, user }) {
   const [details, setDetails] = useState({
     name: "",
     description: "",
+    user_id: user
   });
 
   const [isLoading, setIsLoading] = useState(false);

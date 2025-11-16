@@ -51,7 +51,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name', 'description']
+        fields = ['id', 'name', 'description', 'user_id']
 
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:

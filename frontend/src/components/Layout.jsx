@@ -43,7 +43,7 @@ function Layout({ onAddTransaction, showTransaction, setShowTransaction, editing
             )}
 
             {showCategory && (
-                <NewCategory onClose={() => setShowCategory(false)} />
+                <NewCategory onClose={() => setShowCategory(false)} user={user.id}/>
             )}
 
             {showLimit && (
