@@ -633,8 +633,10 @@ def savings_goal_list(request):
             goal = serializer.save(user=user)
             
             # Create a category for this savings goal
+            
             category, created = Category.objects.get_or_create(
                 name=goal.name,
+                user=goal.user,
                 defaults={'description': f'Savings goal category for {goal.name}'}
             )
             goal.category = category
