@@ -160,8 +160,10 @@ class LoginView(APIView):
         })
 
 class GetCategoriesView(APIView):
-    def get(self, request, format=None):
-        categories = Category.objects.all()
+    def get(self, request, format=None): 
+        print('GET Categories called with params:', request.GET.get('user_id'))  
+        user = Person.objects.get(id=request.GET.get('user_id'))
+        categories = Category.objects.filter(user=user)
         serializer = CategorySerializer(categories, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -169,12 +171,21 @@ class GetCategoriesView(APIView):
 def createCategory(request):
     try:
         name = request.data.get('name')
+        user_id = request.data.get('user_id')
         description = request.data.get('description', '')
 
         if not name:
             return Response({"error": "Name is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not user_id:
+            return Response({"error": "User is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        category = Category.objects.create(name=name, description=description)
+        user = Person.objects.get(id=user_id)
+        if not user:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+
+        category = Category.objects.create(name=name, user=user, description=description)
         return Response({"id": category.id, "name": category.name, "description": category.description}, status=status.HTTP_201_CREATED)
 
     except Exception as e:
@@ -622,8 +633,10 @@ def savings_goal_list(request):
             goal = serializer.save(user=user)
             
             # Create a category for this savings goal
+            
             category, created = Category.objects.get_or_create(
                 name=goal.name,
+                user=goal.user,
                 defaults={'description': f'Savings goal category for {goal.name}'}
             )
             goal.category = category

@@ -12,13 +12,6 @@ class Token(models.Model):
     user_id = models.IntegerField()
     is_used = models.BooleanField(default=False)
 
-class Category(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50)
-    description = models.TextField(blank=True)
-
-    def __str__(self):
-        return self.name
 
 class Person(models.Model):
     id = models.AutoField(primary_key=True)
@@ -35,6 +28,16 @@ class Person(models.Model):
 
     def __str__(self):
         return self.username
+
+class Category(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+    description = models.TextField(blank=True)
+    user = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="categories")
+
+
+    def __str__(self):
+        return self.name
 
 class Transaction(models.Model):
     user = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="transactions")

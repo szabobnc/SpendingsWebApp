@@ -15,6 +15,7 @@ function NewSavingGoal() {
     const [formData, setFormData] = useState({
         name: '',
         target_amount: '',
+        user_id: user?.id,
         monthly_contribution: '',
         deadline: ''
     });
@@ -54,6 +55,7 @@ function NewSavingGoal() {
             setFormData({
                 name: goal.name,
                 target_amount: goal.target_amount.toString(),
+                user_id: user?.id,
                 monthly_contribution: goal.monthly_contribution.toString(),
                 deadline: goal.deadline || ''
             });
