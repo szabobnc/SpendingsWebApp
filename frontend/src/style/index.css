@@ -200,7 +200,7 @@ button.edit {
 }
 
 .charts>div {
-    flex: 1 1 400px;
+    flex: 1 1 300px;
     min-width: 300px;
     max-width: 600px;
     background-color: #ffffff;
@@ -218,7 +218,7 @@ button.edit {
 
 .google-visualization-chart {
     width: 100%;
-    height: auto;
+    height: 10%;
 }
 
 .tx-table {
@@ -229,7 +229,7 @@ button.edit {
     background-color: #ffffff;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 100, 200, 0.1);
+    box-shadow: 0 4px 12px rgba(25, 140, 255, 0.1);
     font-family: 'Segoe UI', sans-serif;
 }
 
@@ -251,7 +251,7 @@ th {
 
 
 tr:nth-child(even) {
-    background-color: #575a5e;
+    background-color: #ccd0d4;
 }
 
 tr:hover {

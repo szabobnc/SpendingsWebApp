@@ -109,7 +109,7 @@ const chartColors = isDark
                     data={incomeData}
                     options={incomeOption}
                     width={"100%"}
-                    height={"350px"}
+                    height={"100%"}
                 />
             )}
             {expenseData.length > 1 && (
@@ -118,7 +118,7 @@ const chartColors = isDark
                     data={expenseData}
                     options={expenseOption}
                     width={"100%"}
-                    height={"350px"}
+                    height={"100%"}
                 />
             )}
         </div>

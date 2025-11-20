@@ -308,7 +308,7 @@ button:hover {
 }
 
 [data-theme="dark"] label {
-  color: #481243;
+  color: #ffffff;
   font-weight: 500;
   font-size: 0.875rem;
 }
@@ -499,7 +499,7 @@ fieldset {
 /* Status Classes */
 .pos-tx {
   font-weight: 600;
-  background-color: #009463 !important;
+  background-color: #35b346a2 !important;
   color: whitesmoke;
 }
 
