@@ -17,6 +17,7 @@ class Person(models.Model):
     id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=100)
+    email = models.EmailField(max_length=255, unique=True, default='')
     income = models.IntegerField(default=0)
     password = models.CharField(max_length=255)  # hashed
     birthday = models.DateField(null=True, blank=True)
