@@ -10,6 +10,7 @@ function Register() {
     const [username, setUsername] = useState("")
     const [name, setName] = useState("")
     const [birthday, setBirthday] = useState("")
+    const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [repassword, setRePassword] = useState("")
     const [isLoading, setIsLoading] = useState(false)
@@ -21,6 +22,7 @@ function Register() {
         setUsername("");
         setName("");
         setBirthday("");
+        setEmail("");
         setPassword("");
         setRePassword("");
     };
@@ -34,6 +36,7 @@ function Register() {
             const response = await axios.post(`${apiUrl}api/register/`, {
                 username,
                 name,
+                email,
                 birthday: birthday || null, // Send null if empty
                 password,
                 repassword
@@ -44,7 +47,7 @@ function Register() {
                 repassword)
             console.log(response.data);
 
-            if(response.data.success){
+            if (response.data.success) {
                 resetForm();
                 toast.success('Profile created successfully!', {
                     position: "top-center",
@@ -86,7 +89,7 @@ function Register() {
 
     return (
         <>
-        <ToastContainer />
+            <ToastContainer />
             <div className="login">
                 <fieldset>
                     <h1>Register</h1>
@@ -112,6 +115,18 @@ function Register() {
                             onChange={(e) => setName(e.target.value)}
                             required
                         />
+
+                        <label htmlFor="email">E-mail:</label>
+                        <input
+                            type="email"
+                            name="email"
+                            id="email"
+                            placeholder="e-mail"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+
 
                         <label htmlFor="password">Password:</label>
                         <input
@@ -145,6 +160,11 @@ function Register() {
                             onChange={(e) => setBirthday(e.target.value)}
                             required
                         />
+                        <label htmlFor="legal">
+                            <input type="checkbox" id="legal" required />
+                            I agree to the <a href="/terms" target="_blank">Terms of Service</a> and
+                            acknowledge the <a href="/privacy" target="_blank">Privacy Policy</a>.
+                        </label>
 
                         <button
                             type="submit"
