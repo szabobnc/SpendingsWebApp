@@ -3,6 +3,7 @@ import { useAuth } from "./context/AuthContext";
 import SimpleLayout from "./SimpleLayout";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
+import { AlignCenter } from "lucide-react";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/';
 
@@ -98,10 +99,10 @@ function NewSavingGoal() {
             }
 
             const token = localStorage.getItem('access_token');
-            const url = isEditing 
+            const url = isEditing
                 ? `${apiUrl}api/savings-goals/${id}/`
                 : `${apiUrl}api/savings-goals/`;
-            
+
             const method = isEditing ? 'PATCH' : 'POST';
 
             const submitData = {
@@ -128,7 +129,7 @@ function NewSavingGoal() {
                     logout();
                     return;
                 }
-                
+
                 // Check if confirmation is required
                 if (responseData.requires_confirmation) {
                     setConfirmationData(responseData);
@@ -136,15 +137,15 @@ function NewSavingGoal() {
                     setLoading(false);
                     return;
                 }
-                
+
                 throw new Error(responseData.error || responseData.message || 'Failed to save goal');
             }
 
             // Show success message with contribution info
-            const successMessage = isEditing 
-                ? 'Savings goal updated successfully!' 
+            const successMessage = isEditing
+                ? 'Savings goal updated successfully!'
                 : `Savings goal created successfully! First contribution of ${responseData.contribution_amount} Ft has been deducted from your balance.`;
-            
+
             toast.success(successMessage, {
                 position: "top-center",
                 autoClose: 5000,
@@ -175,16 +176,16 @@ function NewSavingGoal() {
     // Calculate estimated completion date
     const getEstimatedCompletion = () => {
         if (!formData.target_amount || !formData.monthly_contribution) return null;
-        
+
         const target = parseFloat(formData.target_amount);
         const monthly = parseFloat(formData.monthly_contribution);
-        
+
         if (target <= 0 || monthly <= 0) return null;
-        
+
         const monthsNeeded = Math.ceil(target / monthly);
         const completionDate = new Date();
         completionDate.setMonth(completionDate.getMonth() + monthsNeeded);
-        
+
         return {
             months: monthsNeeded,
             date: completionDate.toLocaleDateString()
@@ -204,7 +205,7 @@ function NewSavingGoal() {
                 <div className="new-goal-page">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                         <h1>{isEditing ? 'Edit Savings Goal' : 'Create New Savings Goal'}</h1>
-                        <button 
+                        <button
                             onClick={() => navigate('/savings-goals')}
                             style={{ background: '#6b7280' }}
                         >
@@ -219,69 +220,86 @@ function NewSavingGoal() {
                     )}
 
                     <form onSubmit={handleSubmit} className="goal-form">
-                        <div className="form-group">
-                            <label htmlFor="name">Goal Name *</label>
-                            <input
-                                type="text"
-                                id="name"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                placeholder="e.g., Emergency Fund, Vacation, New Car"
-                                required
-                                maxLength={100}
-                            />
-                        </div>
+                        <table className="acc-table">
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        Goal name
+                                    </th>
+                                    <td>
+                                        <input
+                                            type="text"
+                                            id="name"
+                                            name="name"
+                                            value={formData.name}
+                                            onChange={handleChange}
+                                            placeholder="e.g., Emergency Fund, Vacation, New Car"
+                                            required
+                                            maxLength={100}
+                                        />
 
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label htmlFor="target_amount">Target Amount (Ft) *</label>
-                                <input
-                                    type="number"
-                                    id="target_amount"
-                                    name="target_amount"
-                                    value={formData.target_amount}
-                                    onChange={handleChange}
-                                    placeholder="100000"
-                                    required
-                                    min="1"
-                                    step="1"
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label htmlFor="monthly_contribution">Monthly Contribution (Ft) *</label>
-                                <input
-                                    type="number"
-                                    id="monthly_contribution"
-                                    name="monthly_contribution"
-                                    value={formData.monthly_contribution}
-                                    onChange={handleChange}
-                                    placeholder="10000"
-                                    required
-                                    min="1"
-                                    step="1"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="deadline">Target Deadline (Optional)</label>
-                            <input
-                                type="date"
-                                id="deadline"
-                                name="deadline"
-                                value={formData.deadline}
-                                onChange={handleChange}
-                                min={new Date().toISOString().split('T')[0]}
-                            />
-                            <small>
-                                Leave empty if you don't have a specific deadline
-                            </small>
-                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Target Amount (Ft)
+                                    </th>
+                                    <td>
+                                        <input
+                                            type="number"
+                                            id="target_amount"
+                                            name="target_amount"
+                                            value={formData.target_amount}
+                                            onChange={handleChange}
+                                            placeholder="100000"
+                                            required
+                                            min="1"
+                                            step="1"
+                                        />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Monthly Contribution (Ft)
+                                    </th>
+                                    <td>
+                                        <input
+                                            type="number"
+                                            id="monthly_contribution"
+                                            name="monthly_contribution"
+                                            value={formData.monthly_contribution}
+                                            onChange={handleChange}
+                                            placeholder="10000"
+                                            required
+                                            min="1"
+                                            step="1"
+                                        />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Target Deadline (Optional)
+                                        <br />
+                                        <small>
+                                            Leave empty if you don't have a specific deadline
+                                        </small>
+                                    </th>
+                                    <td>
+                                        <input
+                                            type="date"
+                                            id="deadline"
+                                            name="deadline"
+                                            value={formData.deadline}
+                                            onChange={handleChange}
+                                            min={new Date().toISOString().split('T')[0]}
+                                        />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
 
                         {estimatedCompletion && (
-                            <div className="estimation-info">
+                            <div className="info-section" style={{ margin: 'auto' }}>
                                 <h3>Estimation</h3>
                                 <div className="estimation-details">
                                     <div>
@@ -291,13 +309,13 @@ function NewSavingGoal() {
                                         <strong>Estimated completion:</strong> {estimatedCompletion.date}
                                     </div>
                                     {formData.deadline && (
-                                        <div style={{ 
-                                            color: new Date(formData.deadline) < new Date(estimatedCompletion.date.split('/').reverse().join('-')) 
+                                        <div style={{
+                                            color: new Date(formData.deadline) < new Date(estimatedCompletion.date.split('/').reverse().join('-'))
                                                 ? '#ef4444' : '#10b981'
                                         }}>
                                             {new Date(formData.deadline) < new Date(estimatedCompletion.date.split('/').reverse().join('-'))
-                                                ? '⚠️ You may not reach your goal by the deadline with this contribution amount'
-                                                : '✅ You should reach your goal before the deadline'
+                                                ? 'You may not reach your goal by the deadline with this contribution amount'
+                                                : 'You should reach your goal before the deadline'
                                             }
                                         </div>
                                     )}
@@ -305,19 +323,19 @@ function NewSavingGoal() {
                             </div>
                         )}
 
-                        <div className="form-actions">
-                            <button 
-                                type="submit" 
+                        <div className="form-actions" style={{ margin: 'auto' }}>
+                            <button
+                                type="submit"
                                 disabled={loading}
                                 style={{ background: '#10b981' }}
                             >
-                                {loading 
-                                    ? (isEditing ? 'Updating...' : 'Creating...') 
+                                {loading
+                                    ? (isEditing ? 'Updating...' : 'Creating...')
                                     : (isEditing ? 'Update Goal' : 'Create Goal')
                                 }
                             </button>
-                            <button 
-                                type="button" 
+                            <button
+                                type="button"
                                 onClick={() => navigate('/savings-goals')}
                                 style={{ background: '#6b7280', marginLeft: '10px' }}
                             >
@@ -329,10 +347,10 @@ function NewSavingGoal() {
                     <div className="info-section">
                         <h3>How Automatic Savings Work</h3>
                         <ul>
-                            <li>💰 When you create a goal, the first month's contribution is automatically deducted from your balance</li>
-                            <li>🛡️ If your monthly contribution is more than 1/3 of your balance, you'll be asked to confirm</li>
-                            <li>🎯 You can have up to 3 active savings goals at the same time</li>
-                            <li>✅ Goals are automatically marked as completed when the target is reached</li>
+                            <li>When you create a goal, the first month's contribution is automatically deducted from your balance</li>
+                            <li>If your monthly contribution is more than 1/3 of your balance, you'll be asked to confirm</li>
+                            <li>You can have up to 3 active savings goals at the same time</li>
+                            <li>Goals are automatically marked as completed when the target is reached</li>
                         </ul>
                     </div>
                 </div>
@@ -341,7 +359,7 @@ function NewSavingGoal() {
                 {showConfirmDialog && confirmationData && (
                     <div className="modal-overlay">
                         <div className="modal-content">
-                            <h3>⚠️ Confirm Savings Goal Creation</h3>
+                            <h3>Confirm Savings Goal Creation</h3>
                             <p>{confirmationData.message}</p>
                             <div style={{ margin: '15px 0', background: '#fef3c7', padding: '15px', borderRadius: '5px' }}>
                                 <div><strong>Current Balance:</strong> {confirmationData.current_balance.toFixed(2)} Ft</div>
@@ -352,14 +370,14 @@ function NewSavingGoal() {
                                 Do you want to proceed with creating this savings goal?
                             </p>
                             <div className="modal-actions">
-                                <button 
+                                <button
                                     onClick={handleConfirmCreate}
                                     style={{ background: '#10b981', marginRight: '10px' }}
                                     disabled={loading}
                                 >
                                     {loading ? 'Creating...' : 'Yes, Create Goal'}
                                 </button>
-                                <button 
+                                <button
                                     onClick={handleCancelCreate}
                                     style={{ background: '#6b7280' }}
                                     disabled={loading}

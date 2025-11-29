@@ -303,13 +303,7 @@ function SavingGoals() {
                             >
                                 <MdAdd /> New Goal
                             </button>
-                            {/*<button 
-                                onClick={() => processContributions(false)}
-                                disabled={processingContributions || activeGoals.length === 0}
-                                style={{ background: '#3b82f6' }}
-                            >
-                                {processingContributions ? 'Processing...' : 'Process Monthly Contributions'}
-                            </button>*/}
+                            
                         </div>
                     </div>
 

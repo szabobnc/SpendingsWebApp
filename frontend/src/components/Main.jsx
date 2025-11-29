@@ -191,7 +191,6 @@ function Main() {
             <h1>Transaction details</h1>
             <h2>Welcome {user?.name}!</h2>
             
-            <h3>Transactions in this month</h3>
             {loadingTransactions || loadingAccount ? (
                 <p>Loading...</p>
             ) : (
