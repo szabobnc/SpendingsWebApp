@@ -166,15 +166,13 @@ function Register() {
                             acknowledge the <a href="/privacy" target="_blank">Privacy Policy</a>.
                         </label>
 
-                        <button
-                            type="submit"
-                            style={{ marginTop: "20px", background: "#205b9f", color: "white" }}
-                        >
-                            Register
-                        </button>
+                        <div className="button-group">
+
+                            <button type="submit">Register</button>
+                            <button className="reset" type="button" onClick={resetForm}>Reset</button>
+                            <button className="delete" onClick={() => navigate("/login")}>Back to Login</button>
+                        </div>
                     </form>
-                    <button type="button" onClick={resetForm}>Reset</button>
-                    <button onClick={() => navigate("/login")}>Back to Login</button>
                 </fieldset>
             </div>
         </>
