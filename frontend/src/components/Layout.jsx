@@ -20,16 +20,16 @@ function Layout({ onAddTransaction, showTransaction, setShowTransaction, editing
         <>
             <div className="navbar">
                 <ThemeToggle />
-                <nav><Link to="/main">Transactions</Link></nav>
+                <nav onClick={() => navigate("/main")}>Transactions</nav>
                 <nav onClick={() => {
                     handleSetEditingTransaction(null);
                     handleSetShowTransaction(true);
                 }}>Add Transaction</nav>
                 <nav onClick={() => setShowCategory(true)}>Add Category</nav>
                 <nav onClick={() => setShowLimit(true)}>Add Limit</nav>
-                <nav><Link to="/savings-goals">Savings Goals</Link></nav>
-                <nav><Link to="/account">Account</Link></nav>
-                <button onClick={logout}>Logout</button>
+                <nav onClick={() => navigate("/savings-goals")}>Savings Goals</nav>
+                <nav onClick={() => navigate("/account")}>Account</nav>
+                <button className="logout" onClick={logout}>Logout</button>
                 <Outlet />
             </div>
 

@@ -1,17 +1,18 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from './context/AuthContext';
 import ThemeToggle from './ThemeToggle';
 
 function SimpleLayout({ children }) {
     const { logout } = useAuth();
+    const navigate = useNavigate();
 
     return (
         <>
             <div className="navbar">
-                <nav><Link to="/main">Transactions</Link></nav>
-                <nav><Link to="/account">Account</Link></nav>
                 <ThemeToggle />
-                <button onClick={logout}>Logout</button>
+                <nav onClick={() => navigate("/main")}>Transactions</nav>
+                <nav onClick={() => navigate("/account")}>Account</nav>
+                <button className="logout" onClick={logout}>Logout</button>
             </div>
             <div className="content">
                 {children}
