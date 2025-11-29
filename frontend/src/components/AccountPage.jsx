@@ -247,67 +247,103 @@ function AccountPage() {
                     <h1>Account Details</h1>
 
                     <div className="account-card">
-                        <p><strong>Username:</strong> {account.username}</p>
-                        <p><strong>Name:</strong> {account.name}</p>
+                        <table className="acc-table">
+                            <tbody>
+                                <tr>
+                                    <th>Username</th>
+                                    <td>{account.username}</td>
+                                </tr>
+                                <tr>
+                                    <th>Name</th>
+                                    <td>{account.name}</td>
+                                </tr>
 
-                        <p>
-                            <strong>Monthly Income:</strong>
-                            {editingIncome ? (
-                                <span style={{ marginLeft: '10px' }}>
-                                    <input
-                                        type="number"
-                                        value={newIncome}
-                                        onChange={(e) => setNewIncome(e.target.value)}
-                                        style={{ width: '100px', marginRight: '10px' }}
-                                    />
-                                    <button onClick={updateIncome} disabled={updating}>
-                                        {updating ? 'Saving...' : 'Save'}
-                                    </button>
-                                    <button onClick={() => {
-                                        setEditingIncome(false);
-                                        setNewIncome(account.income || 0);
-                                    }} style={{ marginLeft: '5px' }}>
-                                        Cancel
-                                    </button>
-                                </span>
-                            ) : (
-                                <span>
-                                    <span className="pos-tx" style={{ marginLeft: '10px' }}>{monthlyIncome.toFixed(2)} Ft</span>
-                                    <button
-                                        onClick={() => setEditingIncome(true)}
-                                        style={{ marginLeft: '10px', fontSize: '12px', padding: '2px 8px' }}
-                                    >
-                                        Edit
-                                    </button>
-                                </span>
-                            )}
-                        </p>
+                                <tr>
+                                    <th>Monthly Income</th>
+                                    <td>
+                                        {editingIncome ? (
+                                            <div className="button-row">
+                                                <input
+                                                    type="number"
+                                                    value={newIncome}
+                                                    onChange={(e) => setNewIncome(e.target.value)}
+                                                />
+                                                <button onClick={updateIncome} disabled={updating}>
+                                                    {updating ? "Saving..." : "Save"}
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setEditingIncome(false);
+                                                        setNewIncome(account.income || 0);
+                                                    }}
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="button-row">
+                                                <span className="pos-tx">{monthlyIncome.toFixed(2)} Ft</span>
+                                                <button onClick={() => setEditingIncome(true)}>
+                                                    Edit
+                                                </button>
+                                            </div>
+                                        )}
+                                    </td>
+                                </tr>
 
-                        {extraIncome > 0 && (
-                            <p><strong>Extra Income (This Month):</strong> <span className="pos-tx">{extraIncome.toFixed(2)} Ft</span></p>
-                        )}
-                        <p><strong>Total Income:</strong> <span className="pos-tx">{totalIncome.toFixed(2)} Ft</span></p>
-                        <p><strong>Total Expenses:</strong> <span className="neg-tx">{expenses.toFixed(2)} Ft</span></p>
-                        <p><strong>Balance:</strong> <span className={balance >= 0 ? "pos-tx" : "neg-tx"}>
-                            {loadingTransactions ? 'Calculating...' : balance.toFixed(2)} Ft
-                        </span></p>
-                        <p><strong>Birthday:</strong> {account.birthday || 'Not set'}</p>
-                        <p>
-                            <strong>Premium:</strong> {account.is_premium ? "Yes" : "No"}
-                            <button
-                                onClick={togglePremium}
-                                disabled={updating}
-                                style={{ marginLeft: '15px', background: account.is_premium ? '#dc2626' : '#10b981' }}
-                            >
-                                {updating
-                                    ? "Updating..."
-                                    : account.is_premium
-                                        ? "Revoke Premium"
-                                        : "Upgrade to Premium"}
-                            </button>
-                        </p>
+                                {extraIncome > 0 && (
+                                    <tr>
+                                        <th>Extra Income (This Month)</th>
+                                        <td>
+                                            <span className="pos-tx">{extraIncome.toFixed(2)} Ft</span>
+                                        </td>
+                                    </tr>
+                                )}
+
+                                <tr>
+                                    <th>Total Income</th>
+                                    <td><span className="pos-tx">{totalIncome.toFixed(2)} Ft</span></td>
+                                </tr>
+
+                                <tr>
+                                    <th>Total Expenses</th>
+                                    <td><span className="neg-tx">{expenses.toFixed(2)} Ft</span></td>
+                                </tr>
+
+                                <tr>
+                                    <th>Balance</th>
+                                    <td>
+                                        <span className={balance >= 0 ? "pos-tx" : "neg-tx"}>
+                                            {loadingTransactions ? "Calculating..." : balance.toFixed(2)} Ft
+                                        </span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th>Birthday</th>
+                                    <td>{account.birthday || "Not set"}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>Premium</th>
+                                    <td>
+                                        <div className="button-row">
+                                            <span>{account.is_premium ? "Yes" : "No"}</span>
+                                            <button onClick={togglePremium} disabled={updating}>
+                                                {updating
+                                                    ? "Updating..."
+                                                    : account.is_premium
+                                                        ? "Revoke Premium"
+                                                        : "Upgrade to Premium"}
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+
             </SimpleLayout>
         </>
     );
