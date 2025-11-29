@@ -162,6 +162,11 @@ nav a {
   border-color: var(--border-hover);
 }
 
+.navbar .logout {
+  margin-left: auto;
+  border: none;
+}
+
 /* =========================================
    BUTTONS
 ========================================= */
@@ -193,12 +198,12 @@ button.delete:hover {
 }
 
 button.edit {
-  background: var(--btn-secondary-bg);
-  color: var(--btn-secondary-text);
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
 }
 
 button.edit:hover {
-  background: var(--btn-secondary-hover);
+  background: var(--btn-primary-hover);
 }
 
 [data-theme="dark"] button:hover {
@@ -332,7 +337,7 @@ fieldset {
 /* =========================================
    TABLES
 ========================================= */
-.tx-table {
+table {
   width: 90%;
   margin: 2rem auto;
   border-collapse: collapse;
@@ -342,18 +347,18 @@ fieldset {
   box-shadow: 0 4px 12px var(--shadow-lg);
 }
 
-.tx-table th {
+table th {
   background: var(--bg-tertiary);
   padding: .75rem 1rem;
   font-weight: 600;
   color: var(--text-primary);
 }
 
-.tx-table td {
+table td {
   padding: .75rem 1rem;
 }
 
-.tx-table tr:hover {
+table tr:hover {
   background: var(--bg-tertiary);
 }
 
@@ -365,6 +370,14 @@ fieldset {
 .pos-tx {
   color: var(--positive-color);
   font-weight: 600;
+}
+
+.acc-table {
+  margin: auto;
+  border: #0b0e0b 1px solid;
+  width: 50%;
+  border-collapse: collapse;
+  text-align: left;
 }
 
 /* =========================================
@@ -395,6 +408,22 @@ fieldset {
   align-items: center;
   background: var(--bg-primary);
 }
+
+/* =========================================
+   CHARTS
+========================================= */
+.charts {
+  width: 90%;
+  display: flex;
+  margin: 2rem auto;
+
+  flex-wrap: wrap;
+  gap: 2rem;
+  padding: 2rem;
+  background: var(--bg-secondary);
+  border-radius: 16px;
+}
+
 
 /* =========================================
    RESPONSIVE
