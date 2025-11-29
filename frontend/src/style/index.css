@@ -170,6 +170,12 @@ nav a {
 /* =========================================
    BUTTONS
 ========================================= */
+div.button-group {
+  display: flex;
+  align-self: center;
+  gap: 1rem;
+}
+
 button {
   padding: .6rem 1rem;
   border-radius: 8px;
@@ -204,6 +210,15 @@ button.edit {
 
 button.edit:hover {
   background: var(--btn-primary-hover);
+}
+
+button.reset {
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+}
+
+button.reset:hover {
+  background: var(--btn-secondary-hover);
 }
 
 [data-theme="dark"] button:hover {
@@ -292,8 +307,7 @@ fieldset {
 }
 
 .modal {
-  width: 100%;
-  max-width: 480px;
+  width: auto;
   background: var(--modal-bg);
   border-radius: .5rem;
   border: 1px solid var(--modal-border);

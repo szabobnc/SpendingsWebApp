@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "./context/AuthContext";
+import { toast } from "react-toastify";
+
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -59,14 +61,32 @@ function SetLimit({ onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!isPremium) {
-      alert("This feature is only available for premium users!");
+      toast.error('This feature is only available for premium users!', {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored"
+      });
       return;
     }
 
     if (!details.category || !details.limit_amount) {
-      alert("Please fill in all fields");
+      toast.warn('Please fill in all fields', {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored"
+      });
       return;
     }
 
@@ -88,16 +108,23 @@ function SetLimit({ onClose }) {
         (c) => c.id === parseInt(details.category)
       )?.name;
 
-      alert(
-        `Successfully set limit of ${details.limit_amount} Ft for ${categoryName}!`
-      );
-      
+      toast.success('Category limit created successfully!', {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored"
+      });
+
       // Refresh the existing limits
       fetchExistingLimits();
-      
+
       // Reset form
       setDetails({ category: "", limit_amount: "" });
-      
+
       onClose();
     } catch (err) {
       console.error("Failed to set limit:", err);
@@ -121,8 +148,18 @@ function SetLimit({ onClose }) {
       await axios.delete(`${apiUrl}api/category-limits/${limitId}/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
-      alert("Limit deleted successfully!");
+
+      toast.success('Category limit deleted successfully!', {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored"
+      });
+
       fetchExistingLimits();
     } catch (err) {
       console.error("Failed to delete limit:", err);
@@ -197,17 +234,21 @@ function SetLimit({ onClose }) {
               required
             />
 
-            <div className="button-row">
+            <div className="button-group">
               <button type="submit" disabled={isLoading}>
                 {isLoading ? "Saving..." : "Save"}
               </button>
               <button
+                className="reset"
                 type="reset"
                 onClick={() => setDetails({ category: "", limit_amount: "" })}
               >
                 Reset
               </button>
-              <button type="button" onClick={onClose}>
+              <button
+                className="delete"
+                type="button"
+                onClick={onClose}>
                 Close
               </button>
             </div>
@@ -235,8 +276,8 @@ function SetLimit({ onClose }) {
                         limit.current_spending?.exceeded
                           ? "neg-tx"
                           : limit.current_spending?.warning
-                          ? "warning-tx"
-                          : ""
+                            ? "warning-tx"
+                            : ""
                       }
                     >
                       <td>{limit.category_name}</td>
@@ -247,8 +288,8 @@ function SetLimit({ onClose }) {
                         {limit.current_spending?.exceeded
                           ? "⚠️ EXCEEDED"
                           : limit.current_spending?.warning
-                          ? "⚠️ WARNING"
-                          : `${limit.current_spending?.percentage || 0}%`}
+                            ? "⚠️ WARNING"
+                            : `${limit.current_spending?.percentage || 0}%`}
                       </td>
                       <td>
                         <button
