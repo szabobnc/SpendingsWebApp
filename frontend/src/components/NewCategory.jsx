@@ -64,14 +64,14 @@ function NewCategory({ onClose, user }) {
               placeholder="Optional description..."
             />
 
-            <div className="button-row">
+            <div className="button-group">
               <button type="submit" disabled={isLoading}>
                 {isLoading ? "Saving..." : "Save"}
               </button>
-              <button type="reset" onClick={() => setDetails({ name: "", description: "" })}>
+              <button className="reset" type="reset" onClick={() => setDetails({ name: "", description: "" })}>
                 Reset
               </button>
-              <button type="button" onClick={onClose}>
+              <button className="delete" type="button" onClick={onClose}>
                 Close
               </button>
             </div>
